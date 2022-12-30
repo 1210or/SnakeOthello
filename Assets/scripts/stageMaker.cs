@@ -8,18 +8,17 @@ public class stageMaker : MonoBehaviour
   public GameObject cam; //カメラを格納
 
   [SerializeField, Range(1, 100)]//スライダ
-  private int stageSizeX = 15; //x方向のステージの大きさ
+  public static int stageSizeX = 15; //x方向のステージの大きさ
 
   [SerializeField, Range(1, 100)] //スライダ
-  private int stageSizeZ = 15; //z方向のステージの大きさ
-
-  //private float stageDistance = 1f;
+  public static int stageSizeZ = 15; //z方向のステージの大きさ
+  
+  public static float[,] stagePosition = new float[stageSizeX,stageSizeZ]; //座標のための配列、ステージの大きさを決めて配列のサイズにする
+  public static GameObject[,] stageObject = new GameObject[stageSizeX,stageSizeZ];//ゲームオブジェクトが入っている配列
+  
     // Start is called before the first frame update
     void Start()
     {
-      float[,] stagePosition = new float[stageSizeX,stageSizeZ]; //座標のための配列、ステージの大きさを決めて配列のサイズにする
-      GameObject[,] stageObject = new GameObject[stageSizeX,stageSizeZ];//ゲームオブジェクトが入っている配列
-
       for(int z=0;z<stagePosition.GetLength(0);z++) //zの大きさぶんループ
       {
         for(int x=0;x<stagePosition.GetLength(1);x++)//xの大きさぶんループ
