@@ -16,9 +16,11 @@ public class changeHexColor : MonoBehaviour
 
     }
 
-    void OnMouseDown()
+    void OnMouseDown() //クリックされると起動
   {
-      print("click " + this.name);
+      print("click " + this.name); //オブジェクトの名前をプリント
+
+      //ランダムにマテリアルカラーを変える
       this.GetComponent<Renderer>().material.color = new Color(Random.value, Random.value, Random.value, 1.0f);
   }
 }
