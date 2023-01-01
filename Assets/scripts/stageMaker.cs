@@ -58,8 +58,11 @@ public class StageHexagon{
           try{arroundHexagons[3] = stageMaker.stageObject[x+1,z];}catch (System.Exception){arroundHexagons[3] = hexagon;}
           try{arroundHexagons[4] = stageMaker.stageObject[x-1,z+1];}catch (System.Exception){arroundHexagons[4] = hexagon;}
           try{arroundHexagons[5] = stageMaker.stageObject[x,z+1];}catch (System.Exception){arroundHexagons[5] = hexagon;}
-          //↑冗長、端で何もない場合は中心のhexagonを入れてるけれど、本当は配列自体を消したい。
+          //↑冗長、端で何もない場合は中心のhexagonを入れてるけれど、本当は配列要素自体を消したい。Listで作るべき？
 
-          return arroundHexagons;
+        
+        //arroundHexagons = arroundHexagons.Where(value => value != hexagon).ToArray();
+        //print(arroundHexagons.Length);
+        return arroundHexagons;
   }
 }
