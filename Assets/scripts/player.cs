@@ -4,12 +4,23 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    //public Color playerColor;
-    public static Color playerColor = Color.red * 0.5f;
+    public Color playerColor;
+    //public static Color playerColor = Color.red * 0.5f;
     
 
-    //直前にいたステージを保存するための変数
+    //直前にいたマスを保存するための変数
     private GameObject solverGameObject;
+
+
+
+    public static Player instance;
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -35,8 +46,6 @@ public class Player : MonoBehaviour
                 if(solverGameObject != hit.collider.gameObject){
                     hit.collider.gameObject.GetComponent<Renderer>().material.color = playerColor;
                     ChangeHexColor.arroundScanFlag = true;//フラグを立てる
-
-                    //print("new");
                 }
                 solverGameObject = hit.collider.gameObject;
             }else

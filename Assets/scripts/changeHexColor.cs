@@ -21,10 +21,9 @@ public class ChangeHexColor : MonoBehaviour
       
       //プレイヤーが新しいマスに入ったタイミングで行う
       if(arroundScanFlag == true){
-
         
         for(int i = 0; i < StageHexagon.arroundHexagons(this.gameObject).Length; i++ ){
-          if(StageHexagon.arroundHexagons(this.gameObject)[i].GetComponent<Renderer>().material.color != Player.playerColor)
+          if(StageHexagon.arroundHexagons(this.gameObject)[i].GetComponent<Renderer>().material.color != Player.instance.playerColor)
           {
             //周囲6個が一つでも塗られていなかったら0にする
             arroundHexColorFlag = arroundHexColorFlag * 0; 
@@ -33,7 +32,7 @@ public class ChangeHexColor : MonoBehaviour
 
         //6個全部がその色だったら真ん中も塗る
         if(arroundHexColorFlag == 1){
-          this.GetComponent<Renderer>().material.color = Player.playerColor;
+          this.GetComponent<Renderer>().material.color = Player.instance.playerColor;
         }
 
         //全部のマスの処理完了をカウント
@@ -46,7 +45,7 @@ public class ChangeHexColor : MonoBehaviour
       //print("click " + this.name); //オブジェクトの名前をプリント
 
       //ランダムにマテリアルカラーを変える
-      this.GetComponent<Renderer>().material.color = Player.playerColor;
+      this.GetComponent<Renderer>().material.color = Player.instance.playerColor;
       //print();
       //周囲の色を変える(ボム)
       for(int i = 0; i < StageHexagon.arroundHexagons(this.gameObject).Length; i++ ){
