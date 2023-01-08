@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class stageMaker : MonoBehaviour
 {
@@ -16,24 +17,30 @@ public class stageMaker : MonoBehaviour
   public static float[,] stagePosition = new float[stageSizeX,stageSizeZ]; //座標のための配列、ステージの大きさを決めて配列のサイズにする
   public static GameObject[,] stageObject = new GameObject[stageSizeX,stageSizeZ];//ゲームオブジェクトが入っている配列
   
+  //ステージのx方向の大きさはcos30の2倍
+  public  static float hexSizeX = MathF.Cos(MathF.PI/6);
+  public  static float hexSizeZ = 0.75f;
+
     // Start is called before the first frame update
     void Start()
-    {
+    {     
       for(int z=0;z<stagePosition.GetLength(0);z++) //zの大きさぶんループ
       {
         for(int x=0;x<stagePosition.GetLength(1);x++)//xの大きさぶんループ
         {
-          //オブジェクトをインスタンスコピー
-          stageObject[x,z] = Instantiate(hexagon, new Vector3(x + z*0.5f, 0, z) , Quaternion.identity);
+           //オブジェクトをインスタンスコピー
+          stageObject[x,z] = Instantiate(hexagon, new Vector3(hexSizeX *  x + z　*　0.5f　* hexSizeX, 0, z * hexSizeZ ) , new Quaternion(1,0,0,-1));
           
           //オブジェクトの名前変更
           stageObject[x,z].name = "hexagon" + x + "_" + z;
         }
       }
 
-      //ステージのサイズに合わせてカメラを動かす
-      cam.transform.position = new Vector3(((stageSizeX - 1) + ((stageSizeZ - 1)/2f))/2f, stageSizeX + stageSizeZ, (stageSizeZ - 1)/2 );
+      //ステージの中心を探す
+      Vector3 stageCenter = (stageObject[(stageSizeX-1)/2,(stageSizeZ-1)/2].transform.position);
 
+      //ステージのサイズに合わせてカメラを動かす
+      cam.transform.position = new Vector3(stageCenter.x, (stageSizeX + stageSizeZ) * 0.8f, stageCenter.z );
     }
 
     // Update is called once per frame
@@ -42,13 +49,14 @@ public class stageMaker : MonoBehaviour
 
     }
 }
+
 public class StageHexagon{
   //引数に入れたゲームオブジェクト(ステージ)の接するステージを配列にして返す
   public static GameObject[] arroundHexagons (GameObject hexagon)
   {
           //位置座標からインデックスに変換
-          int x = (int)(hexagon.transform.position.x - (0.5f * hexagon.transform.position.z));
-          int z = (int)(hexagon.transform.position.z);
+          int x = (int)(hexagon.transform.position.x/stageMaker.hexSizeX - (0.5f * hexagon.transform.position.z)/stageMaker.hexSizeX);
+          int z = (int)(hexagon.transform.position.z/stageMaker.hexSizeZ);
 
           //配列に周囲のステージを格納
           GameObject[] arroundHexagons　= new GameObject[6];
