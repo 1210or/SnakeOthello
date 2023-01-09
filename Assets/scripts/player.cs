@@ -28,7 +28,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //playerColor = playerColor * 0.5f;
+        playerColor = playerColor * 0.5f;
         this.GetComponent<Renderer>().material.color = playerColor * 2;
     
         //初期マスにプレイヤーをとばす
@@ -62,7 +62,7 @@ public class Player : MonoBehaviour
                     try{solverGameObject.GetComponent<Stage>().isPlayerOn =  false;}catch(System.Exception){/*何もしない*/}
 
                     //RGBの赤の値と青の値*-1の輪を求める。
-                    hit.collider.gameObject.GetComponent<Stage>().stagePowerValue = (int)(hit.collider.gameObject.GetComponent<Renderer>().material.color.r + (-1 * hit.collider.gameObject.GetComponent<Renderer>().material.color.b));                   
+                    hit.collider.gameObject.GetComponent<Stage>().stagePowerValue = (int)((2 * hit.collider.gameObject.GetComponent<Renderer>().material.color.r) + (-2 * hit.collider.gameObject.GetComponent<Renderer>().material.color.b));                   
 
                     newHexaFlag = true;//フラグを立てる
                 }else
