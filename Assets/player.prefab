@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 676729113158457330}
   - component: {fileID: 4524958876498827351}
   - component: {fileID: 1814692635355802781}
-  - component: {fileID: 1075939161485406236}
   - component: {fileID: 1075939161485406237}
+  - component: {fileID: 1075939161485406236}
   m_Layer: 0
   m_Name: player
   m_TagString: Untagged
@@ -86,18 +86,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1075939161485406236
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 157600863081844040}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58f3c8faaef2140c489779b559e3e719, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!54 &1075939161485406237
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -114,6 +102,21 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 120
   m_CollisionDetection: 0
+--- !u!114 &1075939161485406236
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 157600863081844040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58f3c8faaef2140c489779b559e3e719, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerColor: {r: 0, g: 0, b: 0, a: 0}
+  firstPosition: 
+  newHexaFlag: 0
 --- !u!1 &1075939163627176277
 GameObject:
   m_ObjectHideFlags: 0

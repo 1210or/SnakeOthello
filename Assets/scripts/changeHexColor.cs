@@ -6,7 +6,7 @@ public class ChangeHexColor : MonoBehaviour
 {
  
   
-  public static bool arroundScanFlag = false;
+  //public static bool newHexaFlag = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -20,10 +20,10 @@ public class ChangeHexColor : MonoBehaviour
       int arroundHexColorFlag = 1;
       
       //プレイヤーが新しいマスに入ったタイミングで行う
-      if(arroundScanFlag == true){
+      if(Player.instance.newHexaFlag == true){
         
-        for(int i = 0; i < StageHexagon.arroundHexagons(this.gameObject).Length; i++ ){
-          if(StageHexagon.arroundHexagons(this.gameObject)[i].GetComponent<Renderer>().material.color != Player.instance.playerColor)
+        for(int i = 0; i < Stage.arroundHexagons(this.gameObject, this.GetComponent<Stage>().stageIndexX, this.GetComponent<Stage>().stageIndexZ).Length; i++ ){
+          if(Stage.arroundHexagons(this.gameObject, this.GetComponent<Stage>().stageIndexX, this.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Renderer>().material.color != Player.instance.playerColor)
           {
             //周囲6個が一つでも塗られていなかったら0にする
             arroundHexColorFlag = arroundHexColorFlag * 0; 
@@ -48,10 +48,10 @@ public class ChangeHexColor : MonoBehaviour
       this.GetComponent<Renderer>().material.color = Player.instance.playerColor;
       //print();
       //周囲の色を変える(ボム)
-      for(int i = 0; i < StageHexagon.arroundHexagons(this.gameObject).Length; i++ ){
+      for(int i = 0; i < Stage.arroundHexagons(this.gameObject, this.GetComponent<Stage>().stageIndexX, this.GetComponent<Stage>().stageIndexZ).Length; i++ ){
 
         //arroundHexagons関数を使ってthis.gameObjectの隣接するヘキサゴンを取得
-        //StageHexagon.arroundHexagons(this.gameObject)[i].GetComponent<Renderer>().material.color = Player.playerColor;
+        //Stage.arroundHexagons(this.gameObject)[i].GetComponent<Renderer>().material.color = Player.playerColor;
       
  
   }
