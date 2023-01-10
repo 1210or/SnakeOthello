@@ -4,11 +4,19 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    //プレイヤーの属性(チーム)のための変数
+    public int playerColorNo = 0;
+
+    //チームカラー
+    public Color teamColor;
+
+    //プレイヤーカラー
     public Color playerColor;
-    //public static Color playerColor = Color.red * 0.5f;
-    
-    [SerializeField]
-    private int[] firstPosition;
+
+    //塗る色
+    public Color paintColor;
+
+    public Vector3 firstPosition;
 
     //直前にいたマスを保存するための変数
     private GameObject solverGameObject;
@@ -28,20 +36,15 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        playerColor = playerColor * 0.5f;
-        this.GetComponent<Renderer>().material.color = playerColor * 2;
-    
-        //初期マスにプレイヤーをとばす
-        this.transform.root.gameObject.transform.position = StageMaker.stageObject[firstPosition[0],firstPosition[1]].transform.position + new Vector3(0, 2, 0);
-        
+        this.transform.Find("player").gameObject.GetComponent<Renderer>().material.color = playerColor;
     }
 
     // Update is called once per frame
     void Update()
     {
-        //print(this.gameObject.name + ": " + newHexaFlag);
+        //マスを塗る
 
-         // 現在の位置から下(0,-1,0)に向かってRayをセット
+        // 現在の位置から下(0,-1,0)に向かってRayをセット
         Ray ray = new Ray(transform.position + new Vector3(0,0.1f,0),Vector3.down);
         // Rayが当たった相手を保存する変数
         RaycastHit hit;
@@ -55,14 +58,14 @@ public class Player : MonoBehaviour
                 if(solverGameObject != hit.collider.gameObject){
                     
                     //足元を塗りつぶす
-                    hit.collider.gameObject.GetComponent<Renderer>().material.color = playerColor;
+                    hit.collider.gameObject.GetComponent<Renderer>().material.color = paintColor;
 
                     //マスの変数を変更する
                     hit.collider.gameObject.GetComponent<Stage>().isPlayerOn = true;
                     try{solverGameObject.GetComponent<Stage>().isPlayerOn =  false;}catch(System.Exception){/*何もしない*/}
 
                     //RGBの赤の値と青の値*-1の輪を求める。
-                    hit.collider.gameObject.GetComponent<Stage>().stagePowerValue = (int)((2 * hit.collider.gameObject.GetComponent<Renderer>().material.color.r) + (-2 * hit.collider.gameObject.GetComponent<Renderer>().material.color.b));                   
+                    hit.collider.gameObject.GetComponent<Stage>().stagePowerValue = playerColorNo;                   
 
                     newHexaFlag = true;//フラグを立てる
                 }else
@@ -73,12 +76,11 @@ public class Player : MonoBehaviour
             }
         }
 
-        //print(this.transform.position.y);
 
         if(this.transform.root.gameObject.transform.position.y < -2){
             
             //初期マスにプレイヤーをとばす
-            this.transform.root.gameObject.transform.position = StageMaker.stageObject[firstPosition[0],firstPosition[1]].transform.position + new Vector3(0, 2, 0);
+            this.transform.root.gameObject.transform.position = firstPosition;
         
         }
     }
