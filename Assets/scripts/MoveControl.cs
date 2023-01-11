@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class MoveControl : MonoBehaviour {
     //移動速度
-    public float speed = 3.0f;
+    public float speed = 2.0f;
 
     public bool isWasd = false;
 
@@ -13,6 +13,7 @@ public class MoveControl : MonoBehaviour {
 
     void Update() {
 
+//斜め移動が早いバグあり、ノーマライズしてないため
         if(isWasd == false){ //wasd操作
             if (Input.GetKey(KeyCode.UpArrow))
             {

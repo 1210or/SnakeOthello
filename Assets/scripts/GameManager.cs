@@ -12,14 +12,15 @@ public class GameManager : MonoBehaviour
     
     //プレイヤー作成のための変数
     public GameObject player;
-    private GameObject[] players = new GameObject[2];
+    public GameObject[] players = new GameObject[2];
 
     //スコアのための変数
     public int totalPowerCount = 0;
 
-    
+    public static GameManager instance;
+
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         //プレイヤーを2人生成、プレイヤーメンバ変数を設定していく
         for(int i = 0;i < players.Length; i++){
@@ -33,7 +34,7 @@ public class GameManager : MonoBehaviour
             players[i].name = "Player" + (i + 1) as string;
 
             //プレイヤーの属性(チーム)を決める
-            players[i].GetComponent<Player>().playerColorNo =  1 - (i*2); //1人目が1, 2人めが-1になる
+            players[i].GetComponent<Player>().playerPowerValue =  1 - (i*2); //1人目が1, 2人めが-1になる
 
             //プレイヤーのチーム色を決める
             players[i].GetComponent<Player>().teamColor = new Color(1-i,0, i); //1人目は赤, 2人目は青
@@ -42,13 +43,19 @@ public class GameManager : MonoBehaviour
             players[i].GetComponent<Player>().playerColor = players[i].GetComponent<Player>().teamColor * 0.4f + new Color(0.7f, 0.7f, 0.7f);
             
             //プレイヤーのマスの色を決める
-            players[i].GetComponent<Player>().paintColor =　players[i].GetComponent<Player>().teamColor * 0.3f + new Color(0.1f, 0.1f, 0.1f);
+            players[i].GetComponent<Player>().paintColor = players[i].GetComponent<Player>().teamColor * 0.3f + new Color(0.1f, 0.1f, 0.1f);
             
             //プレイヤー2を十字キー操作に切り替え
             if(i == 1){
                 players[i].GetComponent<MoveControl>().isWasd = false;
             }
-        }    
+        } 
+
+        //インスタンス生成
+        if (instance == null)
+        {
+            instance = this;
+        }   
      }
 
 
@@ -90,7 +97,7 @@ public class GameManager : MonoBehaviour
         
         for(int i = 0; i < players.Length; i++){ //プレイヤーの人数分まわす
             if(players[i].GetComponent<Player>().newHexaFlag == true){
-                print("どちらかがマスを移動した");
+                //print("どちらかがマスを移動した");
                 break;
             }
         }

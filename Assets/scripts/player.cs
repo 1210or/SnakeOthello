@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     //プレイヤーの属性(チーム)のための変数
-    public int playerColorNo = 0;
+    public int playerPowerValue = 0;
 
     //チームカラー
     public Color teamColor;
@@ -56,21 +56,18 @@ public class Player : MonoBehaviour
 
                 //もし直前のステージと足元のステージが違うならば(新しいマスに入ったら)
                 if(solverGameObject != hit.collider.gameObject){
-                    
-                    //足元を塗りつぶす
-                    hit.collider.gameObject.GetComponent<Renderer>().material.color = paintColor;
-
+                   
                     //マスの変数を変更する
                     hit.collider.gameObject.GetComponent<Stage>().isPlayerOn = true;
                     try{solverGameObject.GetComponent<Stage>().isPlayerOn =  false;}catch(System.Exception){/*何もしない*/}
 
-                    //RGBの赤の値と青の値*-1の輪を求める。
-                    hit.collider.gameObject.GetComponent<Stage>().stagePowerValue = playerColorNo;                   
+                    //ステージパワー値を変更
+                    hit.collider.gameObject.GetComponent<Stage>().stagePowerValue = playerPowerValue;                   
 
                     newHexaFlag = true;//フラグを立てる
                 }else
                 {
-                    newHexaFlag = false;//フラグを立てる
+                    newHexaFlag = false;//フラグを下げる
                 }
                 solverGameObject = hit.collider.gameObject;   
             }
