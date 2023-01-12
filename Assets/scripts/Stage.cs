@@ -11,6 +11,8 @@ public int stageIndexX = 0;
 public int stageIndexZ = 0;
 
 public bool isEdge =false;
+public int distanceFromEdge = 0;
+
 public bool isPlayerOn = false;
 
 //どちら陣営か判定 +1はプレイヤー1、-1はプレイヤー2
@@ -22,17 +24,16 @@ public int[] stageScanFlag = new int[]{1,-1};
     // Start is called before the first frame update
     void Start()
     {
-        
+        this.GetComponent<Renderer>().material.color = new Color ((float)distanceFromEdge/(float)StageMaker.ringsCount, (float)distanceFromEdge/(float)StageMaker.ringsCount, (float)distanceFromEdge/(float)StageMaker.ringsCount);
     }
 
     // Update is called once per frame
     void Update()
     {
       //ステージのパワー値が変わったら色を変更する
-      valueToColor(this.stagePowerValue, GameManager.instance.players[0].GetComponent<Player>().paintColor, GameManager.instance.players[1].GetComponent<Player>().paintColor, new Color(1, 1, 1));
+      valueToColor(this.stagePowerValue, GameManager.instance.players[0].GetComponent<Player>().paintColor, GameManager.instance.players[1].GetComponent<Player>().paintColor);
 
-      //ステージのスキャン地が変わったら色を変更する
-      //valueToColor(this.stageScanFlag[0], new Color(1, 1, 1), new Color(1, 1, 1), new Color(0, 0, 0));
+      
 
       //周囲6マスに合わせて色を塗る
       fillColor1Hexa();
@@ -63,7 +64,7 @@ public int[] stageScanFlag = new int[]{1,-1};
     }
 
     //ステージパワー値によって色を変える
-    public void valueToColor(int stagePowerValue, Color color1, Color color2, Color color3){
+    public void valueToColor(int stagePowerValue, Color color1, Color color2){
       switch (stagePowerValue)
       {
         case 1:
@@ -75,7 +76,7 @@ public int[] stageScanFlag = new int[]{1,-1};
           break;
 
         default:
-          this.GetComponent<Renderer>().material.color = color3;
+          //this.GetComponent<Renderer>().material.color = color3;
           break;
 
       }
@@ -100,14 +101,14 @@ public int[] stageScanFlag = new int[]{1,-1};
             //エッジまたはエッジと触れてるマスと触れていたら
             if((arroundHexagons(stageHexa, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().isEdge == true) || (arroundHexagons(stageHexa, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().stageScanFlag[0] == 0)){            
               stageHexa.GetComponent<Stage>().stageScanFlag[0] = 0; 
-              stageHexa.GetComponent<Renderer>().material.color = new Color(0, 0, 0);
+              //stageHexa.GetComponent<Renderer>().material.color = new Color(0, 0, 0);
 
-              //順番に周りから処理していかないとうまく動かない
+              //順番に周りから処理していかないとうまく動かない、感染の概念を考える必要がある
 
               break;
             }else{ //エッジと触れてない
               stageHexa.GetComponent<Stage>().stageScanFlag[0] = stagePowerValue_;
-              stageHexa.GetComponent<Renderer>().material.color = new Color(1, 1, 1);
+              //stageHexa.GetComponent<Renderer>().material.color = new Color(1, 1, 1);
             }                  
         }
       }else{ //自分が赤である

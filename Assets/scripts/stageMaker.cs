@@ -11,8 +11,7 @@ public class StageMaker : MonoBehaviour
   [SerializeField, Range(1, 100)]//スライダ
   public static int stageSizeX = 8; //x方向のステージの大きさ
 
-  [SerializeField, Range(1, 100)] //スライダ
-  public static int stageSizeZ = 8; //z方向のステージの大きさ
+  public static int stageSizeZ = stageSizeX; //z方向のステージの大きさ
   
   public float[,] stagePosition = new float[stageSizeX,stageSizeZ]; //座標のための配列、ステージの大きさを決めて配列のサイズにする
   public static GameObject[,] stageObject = new GameObject[stageSizeX,stageSizeZ];//ゲームオブジェクトが入っている配列
@@ -25,10 +24,14 @@ public class StageMaker : MonoBehaviour
   
   public GameObject stageParent;
 
+    //ステージの周の数
+   public static int ringsCount;
+
   
     // Start is called before the first frame update
     void Awake()
     {    
+      
       //プレファブを並べる 
       for(int z=0;z<stagePosition.GetLength(0);z++) //zの大きさぶんループ
       {
@@ -48,8 +51,9 @@ public class StageMaker : MonoBehaviour
           //ステージの端を定義
           if(x == 0 || z == 0 || x == stageSizeX - 1 || z == stageSizeZ -1)
           {
-            stageObject[x,z].GetComponent<Stage>().isEdge = true;
+            stageObject[x,z].GetComponent<Stage>().isEdge = true;            
           }
+          
         }
         
       }
@@ -65,6 +69,25 @@ public class StageMaker : MonoBehaviour
 
       //プレファブを非アクティブにする
       hexagon.transform.root.gameObject.SetActive (false);
+
+      //周の数
+      ringsCount = (int)((stageSizeX+1)/2);
+
+      //エッジからの距離を計算
+      for(int r=0; r<ringsCount; r++){
+
+        for(int z=0; z<stageSizeZ-(2*r); z++) //zの大きさぶんループ
+        {
+          stageObject[r, r+z].GetComponent<Stage>().distanceFromEdge = r;
+          stageObject[stageSizeZ-r-1, r+z].GetComponent<Stage>().distanceFromEdge = r;
+
+          for(int x=0; x<stageSizeX-(2*r); x++)//xの大きさぶんループ
+          {
+            stageObject[r+x, r].GetComponent<Stage>().distanceFromEdge = r;
+            stageObject[r+x, stageSizeX-r-1].GetComponent<Stage>().distanceFromEdge = r;
+          }
+        }
+      }
     }
 
     // Update is called once per frame

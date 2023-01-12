@@ -1750,6 +1750,7 @@ MonoBehaviour:
   isEdge: 0
   isPlayerOn: 0
   stagePowerValue: 0
+  stageScanFlag: 01000000ffffffff
 --- !u!1 &919132149379566091 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 157600863081844040, guid: 8f733ce51ccea4c24b17970aba836f4b,
