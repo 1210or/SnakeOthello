@@ -25,20 +25,14 @@ public int[] stageScanFlag = new int[]{1,-1};
     void Start()
     {
         this.GetComponent<Renderer>().material.color = new Color ((float)distanceFromEdge/(float)StageMaker.ringsCount, (float)distanceFromEdge/(float)StageMaker.ringsCount, (float)distanceFromEdge/(float)StageMaker.ringsCount);
+        
     }
 
     // Update is called once per frame
     void Update()
     {
       //ステージのパワー値が変わったら色を変更する
-      valueToColor(this.stagePowerValue, GameManager.instance.players[0].GetComponent<Player>().paintColor, GameManager.instance.players[1].GetComponent<Player>().paintColor);
-
-      
-
-      //周囲6マスに合わせて色を塗る
-      fillColor1Hexa();
-
-      fillColor(this.gameObject, 1);
+      valueToColor(this.stagePowerValue, GameManager.instance.players[0].GetComponent<Player>().paintColor, GameManager.instance.players[1].GetComponent<Player>().paintColor);   
     }
 
     void OnMouseDown() //クリックされると起動
@@ -81,43 +75,6 @@ public int[] stageScanFlag = new int[]{1,-1};
 
       }
     }
-
-    //囲んで塗る
-    public static void fillColor(GameObject stageHexa, int stagePowerValue_){ //stagePowerValue_ = 1
-
-      stageHexa.GetComponent<Stage>().stageScanFlag[0] = stagePowerValue_;
-      
-      //自分が赤じゃない
-      if(stageHexa.GetComponent<Stage>().stagePowerValue != stagePowerValue_){
-      
-        //エッジである
-        if(stageHexa.GetComponent<Stage>().isEdge == true)
-        {
-          stageHexa.GetComponent<Stage>().stageScanFlag[0] = 0;           
-        }
-      
-        //エッジと接している
-        for(int i = 0; i < arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ).Count; i++ ){//周囲マスの数-1回ループ
-            //エッジまたはエッジと触れてるマスと触れていたら
-            if((arroundHexagons(stageHexa, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().isEdge == true) || (arroundHexagons(stageHexa, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().stageScanFlag[0] == 0)){            
-              stageHexa.GetComponent<Stage>().stageScanFlag[0] = 0; 
-              //stageHexa.GetComponent<Renderer>().material.color = new Color(0, 0, 0);
-
-              //順番に周りから処理していかないとうまく動かない、感染の概念を考える必要がある
-
-              break;
-            }else{ //エッジと触れてない
-              stageHexa.GetComponent<Stage>().stageScanFlag[0] = stagePowerValue_;
-              //stageHexa.GetComponent<Renderer>().material.color = new Color(1, 1, 1);
-            }                  
-        }
-      }else{ //自分が赤である
-        stageHexa.GetComponent<Stage>().stageScanFlag[0] = stagePowerValue_;
-      }
-
-    }
-      
-    
 
     //一マス囲んで塗る
     public void fillColor1Hexa(){

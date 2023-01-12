@@ -9,7 +9,7 @@ public class StageMaker : MonoBehaviour
   public GameObject cam; //カメラを格納
 
   [SerializeField, Range(1, 100)]//スライダ
-  public static int stageSizeX = 8; //x方向のステージの大きさ
+  public static int stageSizeX = 15; //x方向のステージの大きさ
 
   public static int stageSizeZ = stageSizeX; //z方向のステージの大きさ
   
@@ -27,15 +27,18 @@ public class StageMaker : MonoBehaviour
     //ステージの周の数
    public static int ringsCount;
 
+   //ステージ端から近い順にオブジェクト
+   public List<GameObject> stageObjectFromEdge;
+
   
     // Start is called before the first frame update
     void Awake()
     {    
       
       //プレファブを並べる 
-      for(int z=0;z<stagePosition.GetLength(0);z++) //zの大きさぶんループ
+      for(int z=0;z<stageSizeZ;z++) //zの大きさぶんループ
       {
-        for(int x=0;x<stagePosition.GetLength(1);x++)//xの大きさぶんループ
+        for(int x=0;x<stageSizeX;x++)//xの大きさぶんループ
         {
       
            //オブジェクトをインスタンスコピー
@@ -88,11 +91,83 @@ public class StageMaker : MonoBehaviour
           }
         }
       }
+
+      //エッジから近い順にリストに追加
+      for(int r=0; r<ringsCount; r++){
+        for(int z=0;z<stageSizeZ;z++) //zの大きさぶんループ
+        {
+          for(int x=0;x<stageSizeX;x++)//xの大きさぶんループ
+          {
+            if(stageObject[x,z].GetComponent<Stage>().distanceFromEdge == r){
+              stageObjectFromEdge.Add(stageObject[x,z]);
+            }
+          }
+        }
+      }
+
     }
 
     // Update is called once per frame
     void Update()
     {
+      //外側から順番に処理
+      for(int i=0; i<stageObjectFromEdge.Count; i++){
+        fillColor(stageObjectFromEdge[i], 1, 0);
+      }   
+      for(int i=0; i<stageObjectFromEdge.Count; i++){
+        fillColor(stageObjectFromEdge[i], -1, 1); //プレイヤー2が後に処理だから有利？
+      }   
+      
+    }
+
+    //囲んで塗る
+    public static void fillColor(GameObject stageHexa, int stagePowerValue_, int stageScanFlagIndex){
+
+         //ステージ走査値をもどす
+        stageHexa.GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] = stagePowerValue_; 
+
+        //外周ループ
+        for(int r=0; r<StageMaker.ringsCount; r++){
+
+          //外周から一周ずつ走査(なくてもいいが無駄に走査回数を増やさないため)
+          if(stageHexa.GetComponent<Stage>().distanceFromEdge == r){
+            //自分が赤じゃない
+            if(stageHexa.GetComponent<Stage>().stagePowerValue != stagePowerValue_){
+
+              //一番外側であれば
+              if(r == 0){
+
+                //ステージ走査値を0にする
+                stageHexa.GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] = 0; 
+
+              }else{ //一番外でなければ
+                  //周囲マス
+                for(int i = 0; i < Stage.arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ).Count; i++ ){
+                //周囲マス中で外周値がr-1あるものを選ぶ 外側から感染じゃなく、隣同士でも感染する必要あり
+                  if(Stage.arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().distanceFromEdge == r-1){ 
+                    
+                    //そのマスの走査値が0であれば
+                    if(Stage.arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] == 0){
+                      
+                      //ステージ走査値を0にする
+                      stageHexa.GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] = 0; 
+                    }
+                  }
+                }
+              }        
+            }
+          }
+        }
+        //赤じゃない
+        if(stageHexa.GetComponent<Stage>().stagePowerValue != stagePowerValue_){
+
+          //ステージ走査値が1だったら塗る
+          if(stageHexa.GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] == stagePowerValue_){
+            stageHexa.GetComponent<Stage>().stagePowerValue = stagePowerValue_;
+          }
+
+        }
     }
 }
+
 
