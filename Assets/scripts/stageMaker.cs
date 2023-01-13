@@ -110,10 +110,20 @@ public class StageMaker : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+      //ステージ走査値をもどす
+      for(int i=0; i<stageObjectFromEdge.Count; i++){
+        stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag = new int[2]{1,-1};
+      }       
       //外側から順番に処理
       for(int i=0; i<stageObjectFromEdge.Count; i++){
         fillColor(stageObjectFromEdge[i], 1, 0);
       }   
+
+      //ステージ走査値をもどす
+      for(int i=0; i<stageObjectFromEdge.Count; i++){
+        stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag = new int[2]{1,-1};
+      } 
+      //外側から順番に処理
       for(int i=0; i<stageObjectFromEdge.Count; i++){
         fillColor(stageObjectFromEdge[i], -1, 1); //プレイヤー2が後に処理だから有利？
       }   
@@ -123,9 +133,7 @@ public class StageMaker : MonoBehaviour
     //囲んで塗る
     public static void fillColor(GameObject stageHexa, int stagePowerValue_, int stageScanFlagIndex){
 
-         //ステージ走査値をもどす
-        stageHexa.GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] = stagePowerValue_; 
-
+         
         //外周ループ
         for(int r=0; r<StageMaker.ringsCount; r++){
 
@@ -144,7 +152,7 @@ public class StageMaker : MonoBehaviour
                   //周囲マス
                 for(int i = 0; i < Stage.arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ).Count; i++ ){
                 //周囲マス中で外周値がr-1あるものを選ぶ 外側から感染じゃなく、隣同士でも感染する必要あり
-                  if(Stage.arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().distanceFromEdge == r-1){ 
+                  //if(Stage.arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().distanceFromEdge == r-1){ 
                     
                     //そのマスの走査値が0であれば
                     if(Stage.arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] == 0){
@@ -152,7 +160,7 @@ public class StageMaker : MonoBehaviour
                       //ステージ走査値を0にする
                       stageHexa.GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] = 0; 
                     }
-                  }
+                  //}
                 }
               }        
             }
