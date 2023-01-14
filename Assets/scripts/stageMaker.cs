@@ -112,70 +112,97 @@ public class StageMaker : MonoBehaviour
     {
       //ステージ走査値をもどす
       for(int i=0; i<stageObjectFromEdge.Count; i++){
-        stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag = new int[2]{1,-1};
-      }       
+        stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[0]=1; //
+      }  
       //外側から順番に処理
       for(int i=0; i<stageObjectFromEdge.Count; i++){
         fillColor(stageObjectFromEdge[i], 1, 0);
-      }   
-
+      } 
+      //塗り潰しをループ分ける
+      for(int i=0; i<stageObjectFromEdge.Count; i++){
+        if(stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[0] == 1)
+        {stageObjectFromEdge[i].GetComponent<Stage>().stagePowerValue = 1;}
+      } 
+      
+      
       //ステージ走査値をもどす
       for(int i=0; i<stageObjectFromEdge.Count; i++){
-        stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag = new int[2]{1,-1};
+        stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[1] = -1;
       } 
       //外側から順番に処理
       for(int i=0; i<stageObjectFromEdge.Count; i++){
         fillColor(stageObjectFromEdge[i], -1, 1); //プレイヤー2が後に処理だから有利？
       }   
+
+      //塗り潰しをループ分ける
+      for(int i=0; i<stageObjectFromEdge.Count; i++){       
+        if(stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[1] == -1)
+        {stageObjectFromEdge[i].GetComponent<Stage>().stagePowerValue = -1;}
+      }   
       
     }
 
     //囲んで塗る
-    public static void fillColor(GameObject stageHexa, int stagePowerValue_, int stageScanFlagIndex){
+    public GameObject fillColor(GameObject stageHexa, int stagePowerValue_, int stageScanFlagIndex){
 
-         
-        //外周ループ
-        for(int r=0; r<StageMaker.ringsCount; r++){
+      GameObject nextScanStage = stageHexa;
+      
+      //自分が赤じゃない(赤の場合)
+      if(stageHexa.GetComponent<Stage>().stagePowerValue != stagePowerValue_){
 
-          //外周から一周ずつ走査(なくてもいいが無駄に走査回数を増やさないため)
-          if(stageHexa.GetComponent<Stage>().distanceFromEdge == r){
-            //自分が赤じゃない
-            if(stageHexa.GetComponent<Stage>().stagePowerValue != stagePowerValue_){
+        //走査値が1である(赤の場合)
+        if(stageHexa.GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] == stagePowerValue_){
+                //一番外側であれば
+                if(stageHexa.GetComponent<Stage>().distanceFromEdge == 0){
 
-              //一番外側であれば
-              if(r == 0){
+                  //ステージ走査値を0にする
+                  stageHexa.GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] = 0; 
 
-                //ステージ走査値を0にする
-                stageHexa.GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] = 0; 
+                }else{//外側でないなら周囲に0があれば0にする
 
-              }else{ //一番外でなければ
-                  //周囲マス
-                for(int i = 0; i < Stage.arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ).Count; i++ ){
-                //周囲マス中で外周値がr-1あるものを選ぶ 外側から感染じゃなく、隣同士でも感染する必要あり
-                  //if(Stage.arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().distanceFromEdge == r-1){ 
-                    
+                  //周囲6回
+                  for(int i = 0; i < Stage.arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ).Count; i++ ){
+
                     //そのマスの走査値が0であれば
                     if(Stage.arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] == 0){
                       
                       //ステージ走査値を0にする
-                      stageHexa.GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] = 0; 
+                      stageHexa.GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] = 0;
+
+                      nextScanStage = stageHexa;
+                      break; //なくてもいい、無駄な処理を繰り返さないため
+
                     }
-                  //}
+                  }
                 }
-              }        
-            }
+                
+                //周囲6回
+                for(int i = 0; i < Stage.arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ).Count; i++ ){
+                    
+                  //次のマスを探す作業
+                  //そのマスの走査値が1であり
+                  if(Stage.arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] == 0){
+                    //そのマスが自分の色じゃない場合
+                    if(Stage.arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().stagePowerValue != stagePowerValue_){
+                      
+                      //次の処理マスを返す
+                      nextScanStage = Stage.arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i];
+                      break;
+                    }
+                  }
+                }
+                //周囲に進めるますがなかったら
+                //周囲6回(逆回転)
+                
+                for(int i = Stage.arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ).Count; i < 0; i-- ){
+                  nextScanStage = Stage.arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i];
+                  break;
+                }
+            }            
           }
+          return nextScanStage;
         }
-        //赤じゃない
-        if(stageHexa.GetComponent<Stage>().stagePowerValue != stagePowerValue_){
-
-          //ステージ走査値が1だったら塗る
-          if(stageHexa.GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] == stagePowerValue_){
-            stageHexa.GetComponent<Stage>().stagePowerValue = stagePowerValue_;
-          }
-
-        }
-    }
+    
 }
 
 
