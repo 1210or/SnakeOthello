@@ -31,6 +31,7 @@ public int[] stageScanFlag = new int[]{1,-1};
     // Update is called once per frame
     void Update()
     {
+      
       //ステージのパワー値が変わったら色を変更する
       valueToColor(this.stagePowerValue, GameManager.instance.players[0].GetComponent<Player>().paintColor, GameManager.instance.players[1].GetComponent<Player>().paintColor);   
     }

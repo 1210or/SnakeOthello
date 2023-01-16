@@ -36,6 +36,9 @@ public class GameManager : MonoBehaviour
             //プレイヤーの属性(チーム)を決める
             players[i].GetComponent<Player>().playerPowerValue =  1 - (i*2); //1人目が1, 2人めが-1になる
 
+            //初期位置のステージにパワー値を設定
+            StageMaker.stageObject[i * (StageMaker.stageSizeX - 1),i * (StageMaker.stageSizeZ - 1)].GetComponent<Stage>().stagePowerValue = players[i].GetComponent<Player>().playerPowerValue;
+
             //プレイヤーのチーム色を決める
             players[i].GetComponent<Player>().teamColor = new Color(1-i,0, i); //1人目は赤, 2人目は青
 
