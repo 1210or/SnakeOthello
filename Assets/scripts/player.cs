@@ -19,7 +19,7 @@ public class Player : MonoBehaviour
     public Vector3 firstPosition;
 
     //直前にいたマスを保存するための変数
-    private GameObject solverGameObject;
+    public GameObject solverGameObject;
 
     //新しいマスに入った瞬間のフラグ
     public bool newHexaFlag = false;

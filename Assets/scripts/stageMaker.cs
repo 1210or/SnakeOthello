@@ -119,8 +119,8 @@ public class StageMaker : MonoBehaviour
       for(int p=0; p<2; p++){
 
         //ステージ走査値をもどす
-        for(int i=0; i<stageObjectFromEdge.Count; i++){
-          stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[p]=1-(2*p); //        
+        for(int i=0; i<stageObjectFromEdge.Count; i++){          
+            stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[p]=1-(2*p); //                                                  
         }  
         
         //外側から順番に処理
@@ -131,13 +131,21 @@ public class StageMaker : MonoBehaviour
           
         } 
 
+        bool willFillHexa = false;
         //塗り潰す
         for(int i=0; i<stageObjectFromEdge.Count; i++){
-          if(stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[p] == 1-(2*p)){
-            if((stageObjectFromEdge[i].GetComponent<Stage>().isPlayerOn) == false){
-              stageObjectFromEdge[i].GetComponent<Stage>().stagePowerValue = 1-(2*p);
-            }           
+
+          if((stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[p] == 1-(2*p))){
+            willFillHexa = true; //塗りつぶせるマスがあればtrue
           }
+          
+          //if(willFillHexa == true){ //一つでも塗りつぶせるマスがあれば
+            if(stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[p] == 1-(2*p)){ //走査値が初期値のままだったら              
+                stageObjectFromEdge[i].GetComponent<Stage>().stagePowerValue = 1-(2*p);
+
+            }
+
+          
         }
         
       }
@@ -237,15 +245,15 @@ public class StageMaker : MonoBehaviour
                 }else{
                   nextScanStage = stageHexa;
                 }            
-              //print(scanStageList[scanStageList.Count-1].name + "をリストから削除");
-              
-              //リストが負の数にならないようにする
-              if((scanStageList.Count-1) >= 0){
-                scanStageList.RemoveAt(scanStageList.Count-1); 
-              }
-                                           
-              //print(nextScanStage.name + "に戻る");
-                   
+                //print(scanStageList[scanStageList.Count-1].name + "をリストから削除");
+                
+                //リストが負の数にならないようにする
+                if((scanStageList.Count-1) >= 0){
+                  scanStageList.RemoveAt(scanStageList.Count-1); 
+                }
+
+                //print(nextScanStage.name + "に戻る");
+                    
                 }
               }
               //print("point2");                  
