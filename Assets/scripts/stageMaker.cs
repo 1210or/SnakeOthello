@@ -10,7 +10,7 @@ public class StageMaker : MonoBehaviour
   public GameObject cam; //カメラを格納
 
   [SerializeField, Range(1, 100)]//スライダ
-  public static int stageSizeX = 8; //x方向のステージの大きさ
+  public static int stageSizeX = 10; //x方向のステージの大きさ
 
   public static int stageSizeZ = stageSizeX; //z方向のステージの大きさ
   
@@ -87,6 +87,7 @@ public class StageMaker : MonoBehaviour
 
           for(int x=0; x<stageSizeX-(2*r); x++)//xの大きさぶんループ
           {
+            //ステージの距離を格納
             stageObject[r+x, r].GetComponent<Stage>().distanceFromEdge = r;
             stageObject[r+x, stageSizeX-r-1].GetComponent<Stage>().distanceFromEdge = r;
           }
@@ -124,19 +125,25 @@ public class StageMaker : MonoBehaviour
         
         //外側から順番に処理
         for(int i=0; i<stageObjectFromEdge.Count; i++){
-          fillColor(stageObjectFromEdge[i], 1-(2*p), p);
+          if(stageObjectFromEdge[i].GetComponent<Stage>().isEdge == true){
+            fillColor(stageObjectFromEdge[i], 1-(2*p), p);
+          }
+          
         } 
 
         //塗り潰す
         for(int i=0; i<stageObjectFromEdge.Count; i++){
           if(stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[p] == 1-(2*p)){
-            stageObjectFromEdge[i].GetComponent<Stage>().stagePowerValue = 1-(2*p);
+            if((stageObjectFromEdge[i].GetComponent<Stage>().isPlayerOn) == false){
+              stageObjectFromEdge[i].GetComponent<Stage>().stagePowerValue = 1-(2*p);
+            }           
           }
         }
         
       }
       
     }
+
 
     //囲んで塗る
     public void fillColor(GameObject stageHexa, int stagePowerValue_, int stageScanFlagIndex){
@@ -171,6 +178,7 @@ public class StageMaker : MonoBehaviour
           if(currentScanStage.GetComponent<Stage>().distanceFromEdge == 0 && stageHexa.GetComponent<Stage>().stagePowerValue != stagePowerValue_){
             //ステージ走査値を0にする                  
             //print(currentScanStage.name + "の走査値を0にした");
+            
             currentScanStage.GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] = 0; 
 
           }else{//外側でないなら周囲に0があれば0にする
@@ -222,39 +230,22 @@ public class StageMaker : MonoBehaviour
               //もし6個全部から進む先がなかったら
               if(i == Stage.arroundHexagons(currentScanStage, currentScanStage.GetComponent<Stage>().stageIndexX, currentScanStage.GetComponent<Stage>().stageIndexZ).Count-1){
               //print("進めなかった");
-
-              nextScanStage = scanStageList[scanStageList.Count-2];
+                
+                //リストが負の数にならないようにする
+                if((scanStageList.Count-2) >= 0){
+                  nextScanStage = scanStageList[scanStageList.Count-2];
+                }else{
+                  nextScanStage = stageHexa;
+                }            
               //print(scanStageList[scanStageList.Count-1].name + "をリストから削除");
               
-              scanStageList.RemoveAt(scanStageList.Count-1);                              
+              //リストが負の数にならないようにする
+              if((scanStageList.Count-1) >= 0){
+                scanStageList.RemoveAt(scanStageList.Count-1); 
+              }
+                                           
               //print(nextScanStage.name + "に戻る");
-                        
-                        //周囲に進めるますがなかったら
-                        //周囲6回(逆回転) 
-
-                        //print(currentScanStage.name + "の周囲" +  Stage.arroundHexagons(currentScanStage, currentScanStage.GetComponent<Stage>().stageIndexX, currentScanStage.GetComponent<Stage>().stageIndexZ).Count + "マスを逆回転で調べて進みます。" );                  
-                        /*for(int j = (Stage.arroundHexagons(currentScanStage, currentScanStage.GetComponent<Stage>().stageIndexX, currentScanStage.GetComponent<Stage>().stageIndexZ).Count-1) ; j >= 0; j -=1 ){
-
-                          //周囲を調べるときに長いから変数に入れとく
-                          tempAroundStage = Stage.arroundHexagons(currentScanStage, currentScanStage.GetComponent<Stage>().stageIndexX, currentScanStage.GetComponent<Stage>().stageIndexZ)[j];
-                          tempScanFlag = Stage.arroundHexagons(currentScanStage, currentScanStage.GetComponent<Stage>().stageIndexX, currentScanStage.GetComponent<Stage>().stageIndexZ)[j].GetComponent<Stage>().stageScanFlag[stageScanFlagIndex];  
-                          tempPowerValue =Stage.arroundHexagons(currentScanStage, currentScanStage.GetComponent<Stage>().stageIndexX, currentScanStage.GetComponent<Stage>().stageIndexZ)[j].GetComponent<Stage>().stagePowerValue;
-                          
-                          print(j + "番目" + tempAroundStage.name + ", 走査値: " + tempScanFlag + "==0, パワー値: " + tempPowerValue + "!=" + stagePowerValue_); 
-                          //次のスキャン先を戻す
-                          //そのマスの走査値が0であり //そのマスが自分の色じゃない場合
-                          if((tempScanFlag == 0) && (tempPowerValue != stagePowerValue_)){
-                              
-                              nextScanStage = scanStageList[scanStageList.Count-2];
-                              print(scanStageList[scanStageList.Count-1].name + "をリストから削除");
-                              scanStageList.RemoveAt(scanStageList.Count-1);                              
-                              //nextScanStage = Stage.arroundHexagons(currentScanStage, currentScanStage.GetComponent<Stage>().stageIndexX, currentScanStage.GetComponent<Stage>().stageIndexZ)[j];
-                              
-                              print(nextScanStage.name + "に戻る");
-                              print("break2");
-                              break;
-                            }
-                        } */                     
+                   
                 }
               }
               //print("point2");                  
