@@ -33,7 +33,7 @@ public int[] stageScanFlag = new int[]{1,-1};
     {
       
       //ステージのパワー値が変わったら色を変更する
-      valueToColor(this.stagePowerValue, GameManager.instance.players[0].GetComponent<Player>().paintColor, GameManager.instance.players[1].GetComponent<Player>().paintColor);   
+      valueToColor(this.stagePowerValue, GameManager.instance.playersList[0].GetComponent<Player>().paintColor, GameManager.instance.playersList[1].GetComponent<Player>().paintColor);   
     }
 
     void OnMouseDown() //クリックされると起動

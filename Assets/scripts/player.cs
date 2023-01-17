@@ -36,6 +36,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //子供オブジェクトを探す
         this.transform.Find("player").gameObject.GetComponent<Renderer>().material.color = playerColor;
     }
 

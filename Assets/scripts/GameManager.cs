@@ -13,7 +13,8 @@ public class GameManager : MonoBehaviour
     
     //プレイヤー作成のための変数
     public GameObject player;
-    public List<GameObject> players;
+    public GameObject[] players = new GameObject[2];
+    public List<GameObject> playersList = null;
 
     //スコアのための変数
     public int totalPowerCount = 0;
@@ -22,7 +23,9 @@ public class GameManager : MonoBehaviour
 
     // Start is called before the first frame update
     void Awake()
-    {/*
+    {
+         print("プレイヤーリストの人数" + playersList.Count + "人");
+        /*
         //プレイヤーを2人生成、プレイヤーメンバ変数を設定していく
         for(int i = 0;i < players.Length; i++){
             //プレイヤーを複製する
@@ -101,8 +104,8 @@ public class GameManager : MonoBehaviour
 
 
         
-        for(int i = 0; i < players.Count; i++){ //プレイヤーの人数分まわす
-            if(players[i].GetComponent<Player>().newHexaFlag == true){
+        for(int i = 0; i < playersList.Count; i++){ //プレイヤーの人数分まわす
+            if(playersList[i].GetComponent<Player>().newHexaFlag == true){
                 //print("どちらかがマスを移動した");
                 break;
             }
