@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
+
 public class GameManager : MonoBehaviour
 {
     //タイマーのための変数
@@ -12,7 +13,7 @@ public class GameManager : MonoBehaviour
     
     //プレイヤー作成のための変数
     public GameObject player;
-    public GameObject[] players = new GameObject[2];
+    public List<GameObject> players;
 
     //スコアのための変数
     public int totalPowerCount = 0;
@@ -21,7 +22,7 @@ public class GameManager : MonoBehaviour
 
     // Start is called before the first frame update
     void Awake()
-    {
+    {/*
         //プレイヤーを2人生成、プレイヤーメンバ変数を設定していく
         for(int i = 0;i < players.Length; i++){
             //プレイヤーを複製する
@@ -52,7 +53,7 @@ public class GameManager : MonoBehaviour
             if(i == 1){
                 players[i].GetComponent<MoveControl>().isWasd = false;
             }
-        } 
+        } */
 
         //インスタンス生成
         if (instance == null)
@@ -67,6 +68,8 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+
         if(totalTime != 0){
 
             if(totalTime > 0){//ゲーム中
@@ -98,7 +101,7 @@ public class GameManager : MonoBehaviour
 
 
         
-        for(int i = 0; i < players.Length; i++){ //プレイヤーの人数分まわす
+        for(int i = 0; i < players.Count; i++){ //プレイヤーの人数分まわす
             if(players[i].GetComponent<Player>().newHexaFlag == true){
                 //print("どちらかがマスを移動した");
                 break;

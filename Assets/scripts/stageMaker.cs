@@ -118,7 +118,7 @@ public class StageMaker : MonoBehaviour
       //プレイヤーの人数行う GameManager.instance.players.Length
       for(int p=0; p<2; p++){
 
-        //ステージ走査値をもどす
+        //ステージ走査値を初期値にする
         for(int i=0; i<stageObjectFromEdge.Count; i++){          
             stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[p]=1-(2*p); //                                                  
         }  
@@ -131,15 +131,16 @@ public class StageMaker : MonoBehaviour
           
         } 
 
-        bool willFillHexa = false;
+        //既に塗られているところの走査値を0にする//今のところなくてもいいがこの操作によって新規で囲まれた部分だけを濡れる
+        for(int i=0; i<stageObjectFromEdge.Count; i++){    
+          if(stageObjectFromEdge[i].GetComponent<Stage>().stagePowerValue == 1-(2*p)){      
+            stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[p] = 0; //                                                  
+          }  
+        }
+
         //塗り潰す
         for(int i=0; i<stageObjectFromEdge.Count; i++){
 
-          if((stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[p] == 1-(2*p))){
-            willFillHexa = true; //塗りつぶせるマスがあればtrue
-          }
-          
-          //if(willFillHexa == true){ //一つでも塗りつぶせるマスがあれば
             if(stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[p] == 1-(2*p)){ //走査値が初期値のままだったら              
                 stageObjectFromEdge[i].GetComponent<Stage>().stagePowerValue = 1-(2*p);
 
