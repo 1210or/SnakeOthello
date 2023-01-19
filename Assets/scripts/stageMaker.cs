@@ -72,7 +72,7 @@ public class StageMaker : MonoBehaviour
       cam.transform.position = stageCenter + new Vector3(0, 0, 1.8f);
 
       //プレファブを非アクティブにする
-      hexagon.transform.root.gameObject.SetActive (false);
+      //hexagon.transform.root.gameObject.SetActive (false);
 
       //周の数
       ringsCount = (int)((stageSizeX+1)/2);

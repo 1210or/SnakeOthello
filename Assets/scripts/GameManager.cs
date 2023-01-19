@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Photon.Pun;
+using Photon.Realtime;
 
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviourPunCallbacks
 {
     //タイマーのための変数
     [SerializeField, Range(0, 100)]
@@ -23,40 +25,10 @@ public class GameManager : MonoBehaviour
 
     // Start is called before the first frame update
     void Awake()
-    {
+    {   // PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
+        PhotonNetwork.ConnectUsingSettings();
+
          print("プレイヤーリストの人数" + playersList.Count + "人");
-        /*
-        //プレイヤーを2人生成、プレイヤーメンバ変数を設定していく
-        for(int i = 0;i < players.Length; i++){
-            //プレイヤーを複製する
-            players[i] = Instantiate(player, StageMaker.stageObject[i * (StageMaker.stageSizeX - 1),i * (StageMaker.stageSizeZ - 1)].transform.position + new Vector3(0, 2, 0) , new Quaternion(1,0,0,180)); 
-            
-            //初期位置を格納
-            players[i].GetComponent<Player>().firstPosition = StageMaker.stageObject[i * (StageMaker.stageSizeX - 1),i * (StageMaker.stageSizeZ - 1)].transform.position + new Vector3(0, 2, 0);
-
-            //プレイヤーの名前を変える
-            players[i].name = "Player" + (i + 1) as string;
-
-            //プレイヤーの属性(チーム)を決める
-            players[i].GetComponent<Player>().playerPowerValue =  1 - (i*2); //1人目が1, 2人めが-1になる
-
-            //初期位置のステージにパワー値を設定
-            StageMaker.stageObject[i * (StageMaker.stageSizeX - 1),i * (StageMaker.stageSizeZ - 1)].GetComponent<Stage>().stagePowerValue = players[i].GetComponent<Player>().playerPowerValue;
-
-            //プレイヤーのチーム色を決める
-            players[i].GetComponent<Player>().teamColor = new Color(1-i,0, i); //1人目は赤, 2人目は青
-
-            //プレイヤー自身の色を変える
-            players[i].GetComponent<Player>().playerColor = players[i].GetComponent<Player>().teamColor * 0.4f + new Color(0.7f, 0.7f, 0.7f);
-            
-            //プレイヤーのマスの色を決める
-            players[i].GetComponent<Player>().paintColor = players[i].GetComponent<Player>().teamColor * 0.3f + new Color(0.1f, 0.1f, 0.1f);
-            
-            //プレイヤー2を十字キー操作に切り替え
-            if(i == 1){
-                players[i].GetComponent<MoveControl>().isWasd = false;
-            }
-        } */
 
         //インスタンス生成
         if (instance == null)
@@ -64,15 +36,23 @@ public class GameManager : MonoBehaviour
             instance = this;
         }   
      }
-
+    // マスターサーバーへの接続が成功した時に呼ばれるコールバック
+    public override void OnConnectedToMaster() {
+        // "Room"という名前のルームに参加する（ルームが存在しなければ作成して参加する）
+        PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions(), TypedLobby.Default);
+    }
 
     
 
     // Update is called once per frame
     void Update()
-    {
+    {   
 
+        //esc終了
+        if (Input.GetKeyDown(KeyCode.Escape))
+            Application.Quit();
 
+        //時間制限と勝敗
         if(totalTime != 0){
 
             if(totalTime > 0){//ゲーム中
@@ -111,4 +91,46 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+    // ゲームサーバーへの接続が成功した時に呼ばれるコールバック
+    public override void OnJoinedRoom() {
+        
+        //プレイヤーの人数が2人以下なら
+        if(PhotonNetwork.PlayerList.Length < 3){
+            
+            //配列のインデックスをプレイヤーの人数から定義
+            int i = PhotonNetwork.PlayerList.Length - 1;
+            
+            //初期位置を格納
+            Vector3 firstPosition = StageMaker.stageObject[i * (StageMaker.stageSizeX - 1),i * (StageMaker.stageSizeZ - 1)].transform.position;
+            
+            //プレイヤーの人スタンスを生成
+            GameObject player = PhotonNetwork.Instantiate("Player", firstPosition + new Vector3(0, 2, 0) , new Quaternion(1,0,0,180)); 
+
+            
+            //初期位置を決める
+            player.GetComponent<Player>().firstPosition = firstPosition;
+
+            //これが同期されていない
+            playersList.Add(player);
+
+            //プレイヤーの名前を変える
+            player.name = "Player" + (i + 1) as string;
+
+            //プレイヤーの属性(チーム)を決める
+            player.GetComponent<Player>().playerPowerValue =  1 - (i*2); //1人目が1, 2人めが-1になる
+
+            //初期位置のステージにパワー値を設定
+            StageMaker.stageObject[i * (StageMaker.stageSizeX - 1),i * (StageMaker.stageSizeZ - 1)].GetComponent<Stage>().stagePowerValue = player.GetComponent<Player>().playerPowerValue;
+
+            //プレイヤーのチーム色を決める
+            player.GetComponent<Player>().teamColor = new Color(1-i,0, i); //1人目は赤, 2人目は青
+
+            //プレイヤー自身の色を変える
+            player.GetComponent<Player>().playerColor = player.GetComponent<Player>().teamColor * 0.4f + new Color(0.7f, 0.7f, 0.7f);
+                
+            //プレイヤーのマスの色を決める
+            player.GetComponent<Player>().paintColor = player.GetComponent<Player>().teamColor * 0.3f + new Color(0.1f, 0.1f, 0.1f);
+
+         }
+        }
 }

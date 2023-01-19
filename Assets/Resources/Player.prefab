@@ -40,11 +40,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1339817059557221365}
-  - component: {fileID: 1339817059557221370}
   - component: {fileID: -8433747515720830631}
   - component: {fileID: 1339817059557221364}
-  - component: {fileID: 1339817059557221367}
   - component: {fileID: 4747537304491998765}
+  - component: {fileID: 1339817059557221367}
   - component: {fileID: 2029621694687559713}
   m_Layer: 0
   m_Name: Player
@@ -69,20 +68,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1339817059557221370
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1339817059557221371}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 274bfa0ecbbb14413a36cc548dbf267a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 3
-  isWasd: 1
 --- !u!114 &-8433747515720830631
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -111,6 +96,30 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &4747537304491998765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339817059557221371}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 0
+  ObservedComponents:
+  - {fileID: 1339817059557221367}
+  - {fileID: 2029621694687559713}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!114 &1339817059557221367
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -130,29 +139,6 @@ MonoBehaviour:
   firstPosition: {x: 0, y: 0, z: 0}
   solverGameObject: {fileID: 0}
   newHexaFlag: 0
---- !u!114 &4747537304491998765
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1339817059557221371}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents:
-  - {fileID: 2029621694687559713}
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!114 &2029621694687559713
 MonoBehaviour:
   m_ObjectHideFlags: 0

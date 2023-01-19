@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviourPunCallbacks, IPunObservable
 {
     //プレイヤーの属性(チーム)のための変数
     public int playerPowerValue = 0;
@@ -16,6 +18,7 @@ public class Player : MonoBehaviour
     //塗る色
     public Color paintColor;
 
+    //初期位置
     public Vector3 firstPosition;
 
     //直前にいたマスを保存するための変数
@@ -36,7 +39,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //子供オブジェクトを探す
+        //プレイヤーの子供オブジェクトの色を変える
         this.transform.Find("player").gameObject.GetComponent<Renderer>().material.color = playerColor;
     }
 
@@ -78,8 +81,90 @@ public class Player : MonoBehaviour
         if(this.transform.root.gameObject.transform.position.y < -2){
             
             //初期マスにプレイヤーをとばす
-            this.transform.root.gameObject.transform.position = firstPosition;
+            this.transform.root.gameObject.transform.position = firstPosition + new Vector3(0, 2, 0);
         
         }
     }
+
+//名前空間、継承、コンポーネントアタッチ必須、順番通りに送受信されるので順番が大切
+//同期
+    void IPunObservable.OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo i_info )
+    {
+        if(stream.IsWriting )
+        {
+            //データの送信
+            //プレイヤーカラー
+            
+            stream.SendNext(this.GetComponent<Player>().playerColor.r);
+            stream.SendNext(this.GetComponent<Player>().playerColor.g);
+            stream.SendNext(this.GetComponent<Player>().playerColor.b);
+            //stream.SendNext(this.GetComponent<Player>().playerColor.a);
+
+            //初期位置
+            stream.SendNext(this.GetComponent<Player>().firstPosition);
+            
+            //パワー値
+            stream.SendNext(this.GetComponent<Player>().playerPowerValue);
+
+            
+            //チームカラー
+            stream.SendNext(this.GetComponent<Player>().teamColor.r);
+            stream.SendNext(this.GetComponent<Player>().teamColor.g);
+            stream.SendNext(this.GetComponent<Player>().teamColor.b);
+
+            //プレイヤーカラー
+            stream.SendNext(this.GetComponent<Player>().playerColor.r);
+            stream.SendNext(this.GetComponent<Player>().playerColor.g);
+            stream.SendNext(this.GetComponent<Player>().playerColor.b);
+
+            //塗る色
+            stream.SendNext(this.GetComponent<Player>().paintColor.r);
+            stream.SendNext(this.GetComponent<Player>().paintColor.g);
+            stream.SendNext(this.GetComponent<Player>().paintColor.b);
+        }
+        else
+        {            
+            //データの受信
+            //プレイヤーカラー            
+            float r = (float)stream.ReceiveNext();
+            float g = (float)stream.ReceiveNext();
+            float b = (float)stream.ReceiveNext(); 
+
+            //初期位置
+            Vector3 firstPosition = (Vector3)stream.ReceiveNext();
+
+            //パワー値        
+            int playerPowerValue = (int)stream.ReceiveNext();
+
+            float teamColorR = (float)stream.ReceiveNext();
+            float teamColorG = (float)stream.ReceiveNext();
+            float teamColorB = (float)stream.ReceiveNext();
+
+            float playerColorR = (float)stream.ReceiveNext();
+            float playerColorG = (float)stream.ReceiveNext();
+            float playerColorB = (float)stream.ReceiveNext();
+
+            float paintColorR = (float)stream.ReceiveNext();
+            float paintColorG = (float)stream.ReceiveNext();
+            float paintColorB = (float)stream.ReceiveNext();
+            
+            
+
+            this.transform.Find("player").gameObject.GetComponent<Renderer>().material.color = new Color(r, g, b, 1);
+            
+            this.GetComponent<Player>().playerPowerValue = playerPowerValue;
+            
+            this.GetComponent<Player>().firstPosition = firstPosition;
+            
+
+
+            this.GetComponent<Player>().teamColor = new Color(teamColorR, teamColorG, teamColorB, 1);
+
+            this.GetComponent<Player>().playerColor = new Color(playerColorR, playerColorG, playerColorB, 1);
+
+            this.GetComponent<Player>().paintColor = new Color(paintColorR, paintColorG, paintColorB, 1);
+
+        }
+    }
 }
+

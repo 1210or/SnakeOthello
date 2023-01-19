@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class Stage : MonoBehaviour
+public class Stage : MonoBehaviourPunCallbacks, IPunObservable
 {
 //マスの形状
 public GameObject hexagon;
@@ -32,8 +34,20 @@ public int[] stageScanFlag = new int[]{1,-1};
     void Update()
     {
       
-      //ステージのパワー値が変わったら色を変更する
-      valueToColor(this.stagePowerValue, GameManager.instance.playersList[0].GetComponent<Player>().paintColor, GameManager.instance.playersList[1].GetComponent<Player>().paintColor);   
+      if(PhotonNetwork.PlayerList.Length > 0){
+        
+        if(this.stagePowerValue != 0){
+          //ステージのパワー値が変わったら色を変更する
+          //playerListが同期されていない
+          //this.GetComponent<Renderer>().material.color = GameManager.instance.playersList[(int)(-0.5f*(this.stagePowerValue-1))].GetComponent<Player>().paintColor;
+          
+          //とりあえず赤と青にしてる本当は上のコードで書きたい
+          this.GetComponent<Renderer>().material.color = new Color(0.5f*(this.stagePowerValue+1),0,-0.5f*(this.stagePowerValue-1));
+        }
+        
+      }
+      
+      
     }
 
     void OnMouseDown() //クリックされると起動
@@ -58,24 +72,6 @@ public int[] stageScanFlag = new int[]{1,-1};
           return arroundHexagons;
     }
 
-    //ステージパワー値によって色を変える
-    public void valueToColor(int stagePowerValue, Color color1, Color color2){
-      switch (stagePowerValue)
-      {
-        case 1:
-          this.GetComponent<Renderer>().material.color = color1;
-          break;
-
-        case -1:
-          this.GetComponent<Renderer>().material.color = color2;
-          break;
-
-        default:
-          //this.GetComponent<Renderer>().material.color = color3;
-          break;
-
-      }
-    }
 
     //一マス囲んで塗る
     public void fillColor1Hexa(){
@@ -118,5 +114,23 @@ public int[] stageScanFlag = new int[]{1,-1};
 
       }
 
+    }
+
+//名前空間、継承、コンポーネントアタッチ必須
+    void IPunObservable.OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo i_info )
+    {
+        if(stream.IsWriting )
+        {
+            //データの送信
+            //ステージパワー値
+            stream.SendNext((int)this.GetComponent<Stage>().stagePowerValue);            
+        }
+        else
+        {            
+            //データの受信
+            int s = (int)stream.ReceiveNext();            
+
+            this.GetComponent<Stage>().stagePowerValue = s; 
+        }
     }
 }
