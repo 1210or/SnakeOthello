@@ -1065,7 +1065,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 548303740232e4eee9e957d878fd2594, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalTime: 10
+  totalTime: 60
   finishText: {fileID: 1181773818}
   timerCountText: {fileID: 1810246489}
   player: {fileID: 1339817059557221371, guid: 8f733ce51ccea4c24b17970aba836f4b, type: 3}
