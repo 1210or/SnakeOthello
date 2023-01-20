@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 4726028008455737665}
   - component: {fileID: 5052053697772541108}
   - component: {fileID: -1692420760290101528}
-  - component: {fileID: -8354338225422108528}
   m_Layer: 0
   m_Name: stageHexa
   m_TagString: stage
@@ -136,28 +135,11 @@ MonoBehaviour:
   ObservedComponentsFoldoutOpen: 1
   Group: 0
   prefixField: -1
-  Synchronization: 2
+  Synchronization: 1
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
   - {fileID: 5052053697772541108}
-  - {fileID: -8354338225422108528}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
---- !u!114 &-8354338225422108528
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5573011843609136651}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SynchronizePosition: 1
-  m_SynchronizeRotation: 0
-  m_SynchronizeScale: 0
-  m_UseLocal: 1

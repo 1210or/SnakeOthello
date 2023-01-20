@@ -22,7 +22,7 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
     public Vector3 firstPosition;
 
     //直前にいたマスを保存するための変数
-    public GameObject solverGameObject;
+    public GameObject solverGameObject = null;
 
     //新しいマスに入った瞬間のフラグ
     public bool newHexaFlag = false;
@@ -57,23 +57,26 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         if(Physics.Raycast(ray, out hit, 10.0f)) {
             // もし当たった相手のタグがstageなら下の足場の色を変える
             if(hit.collider.tag == "stage") {
-
-                //もし直前のステージと足元のステージが違うならば(新しいマスに入ったら)
-                if(solverGameObject != hit.collider.gameObject){
-                   
-                    //マスの変数を変更する
-                    hit.collider.gameObject.GetComponent<Stage>().isPlayerOn = true;
-                    try{solverGameObject.GetComponent<Stage>().isPlayerOn =  false;}catch(System.Exception){/*何もしない*/}
-
-                    //ステージパワー値を変更
-                    hit.collider.gameObject.GetComponent<Stage>().stagePowerValue = playerPowerValue;                   
-
-                    newHexaFlag = true;//フラグを立てる
-                }else
-                {
-                    newHexaFlag = false;//フラグを下げる
-                }
-                solverGameObject = hit.collider.gameObject;   
+                //プレイヤーが2人ならステージパワー値を変更
+                if(PhotonNetwork.PlayerList.Length == 2){ 
+                
+                    //もし直前のステージと足元のステージが違うならば(新しいマスに入ったら)
+                    //if(solverGameObject != hit.collider.gameObject){
+    
+                        //マスの変数を変更する
+                        hit.collider.gameObject.GetComponent<Stage>().isPlayerOn = true;
+                        try{solverGameObject.GetComponent<Stage>().isPlayerOn =  false;}catch(System.Exception){/*何もしない*/}                      
+                        
+                        hit.collider.gameObject.GetComponent<Stage>().stagePowerValue = playerPowerValue;      
+                        //newHexaFlag = true;//フラグを立てる
+                                        
+                    //}else
+                    //{
+                        //newHexaFlag = false;//フラグを下げる
+                    //}
+                
+                    solverGameObject = hit.collider.gameObject;
+                }   
             }
         }
 

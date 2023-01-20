@@ -25,8 +25,7 @@ public int[] stageScanFlag = new int[]{1,-1};
 
     // Start is called before the first frame update
     void Start()
-    {
-        this.GetComponent<Renderer>().material.color = new Color ((float)distanceFromEdge/(float)StageMaker.ringsCount, (float)distanceFromEdge/(float)StageMaker.ringsCount, (float)distanceFromEdge/(float)StageMaker.ringsCount);
+    {        
         
     }
 
@@ -50,11 +49,6 @@ public int[] stageScanFlag = new int[]{1,-1};
       
     }
 
-    void OnMouseDown() //クリックされると起動
-    {
-      colorBomb(this.gameObject, new Color(0, 0, 0), 0);
-    }
-
       //引数に入れたゲームオブジェクト(ステージ)の接するステージを配列にして返す
     public static List<GameObject> arroundHexagons (GameObject hexagon, int x, int z)
     {
@@ -62,41 +56,14 @@ public int[] stageScanFlag = new int[]{1,-1};
             List<GameObject> arroundHexagons = new List<GameObject>();
             
             //左下から反時計回り
-            try{arroundHexagons.Add(StageMaker.stageObject[x,z-1]);}catch (System.Exception){/*何もしない*/} //左下
-            try{arroundHexagons.Add(StageMaker.stageObject[x+1,z-1]);}catch (System.Exception){/*何もしない*/} //下
-            try{arroundHexagons.Add(StageMaker.stageObject[x+1,z]);}catch (System.Exception){/*何もしない*/} //右下
-            try{arroundHexagons.Add(StageMaker.stageObject[x,z+1]);}catch (System.Exception){/*何もしない*/} //右上
-            try{arroundHexagons.Add(StageMaker.stageObject[x-1,z+1]);}catch (System.Exception){/*何もしない*/} //上
-            try{arroundHexagons.Add(StageMaker.stageObject[x-1,z]);}catch (System.Exception){/*何もしない*/} //左上
+            try{arroundHexagons.Add(StageManager.stageObject[x,z-1]);}catch (System.Exception){/*何もしない*/} //左下
+            try{arroundHexagons.Add(StageManager.stageObject[x+1,z-1]);}catch (System.Exception){/*何もしない*/} //下
+            try{arroundHexagons.Add(StageManager.stageObject[x+1,z]);}catch (System.Exception){/*何もしない*/} //右下
+            try{arroundHexagons.Add(StageManager.stageObject[x,z+1]);}catch (System.Exception){/*何もしない*/} //右上
+            try{arroundHexagons.Add(StageManager.stageObject[x-1,z+1]);}catch (System.Exception){/*何もしない*/} //上
+            try{arroundHexagons.Add(StageManager.stageObject[x-1,z]);}catch (System.Exception){/*何もしない*/} //左上
 
           return arroundHexagons;
-    }
-
-
-    //一マス囲んで塗る
-    public void fillColor1Hexa(){
-      //自分の周りのマスが全て同じカラーだったら自分の色を変更する
-        if(arroundHexagons(this.gameObject, stageIndexX, stageIndexZ).Count == 6){
-
-          for(int i = 0; i < arroundHexagons(this.gameObject, stageIndexX, stageIndexZ).Count - 1; i++ ){//周囲マスの数-1回ループ
-
-            //自分と周囲マス左下が違う色かつ、周囲マスが反時計回りに一つ隣と同じ色である
-            if(
-                (this.stagePowerValue != (arroundHexagons(this.gameObject, stageIndexX, stageIndexZ)[0].GetComponent<Stage>().stagePowerValue))               
-                & (arroundHexagons(this.gameObject, stageIndexX, stageIndexZ)[i].GetComponent<Stage>().stagePowerValue) == (arroundHexagons(this.gameObject, stageIndexX, stageIndexZ)[i+1].GetComponent<Stage>().stagePowerValue)
-              ){            
-                if(i == (arroundHexagons(this.gameObject, stageIndexX, stageIndexZ).Count - 2)){ //ループの一番最後の処理
-
-                  //ステージパワー値を変更
-                  this.stagePowerValue = arroundHexagons(this.gameObject, stageIndexX, stageIndexZ)[0].GetComponent<Stage>().stagePowerValue;
-                  
-                }
-              }else{
-                break;
-              }
-          }
-        }
-
     }
 
     
@@ -123,14 +90,12 @@ public int[] stageScanFlag = new int[]{1,-1};
         {
             //データの送信
             //ステージパワー値
-            stream.SendNext((int)this.GetComponent<Stage>().stagePowerValue);            
+            stream.SendNext((int)this.GetComponent<Stage>().stagePowerValue);        
         }
         else
         {            
             //データの受信
-            int s = (int)stream.ReceiveNext();            
-
-            this.GetComponent<Stage>().stagePowerValue = s; 
+            this.GetComponent<Stage>().stagePowerValue = (int)stream.ReceiveNext();            
         }
     }
 }
