@@ -61,21 +61,15 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
                 if(PhotonNetwork.PlayerList.Length == 2){ 
                 
                     //もし直前のステージと足元のステージが違うならば(新しいマスに入ったら)
-                    //if(solverGameObject != hit.collider.gameObject){
+                    if(hit.collider.gameObject.GetComponent<Stage>().stagePowerValue != playerPowerValue){
     
                         //マスの変数を変更する
                         hit.collider.gameObject.GetComponent<Stage>().isPlayerOn = true;
                         try{solverGameObject.GetComponent<Stage>().isPlayerOn =  false;}catch(System.Exception){/*何もしない*/}                      
                         
                         hit.collider.gameObject.GetComponent<Stage>().stagePowerValue = playerPowerValue;      
-                        //newHexaFlag = true;//フラグを立てる
-                                        
-                    //}else
-                    //{
-                        //newHexaFlag = false;//フラグを下げる
-                    //}
-                
-                    solverGameObject = hit.collider.gameObject;
+                    }
+                    //solverGameObject = hit.collider.gameObject;
                 }   
             }
         }
@@ -124,6 +118,9 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
             stream.SendNext(this.GetComponent<Player>().paintColor.r);
             stream.SendNext(this.GetComponent<Player>().paintColor.g);
             stream.SendNext(this.GetComponent<Player>().paintColor.b);
+        
+            //stream.SendNext(this.GetComponent<Player>().solverGameObject);
+
         }
         else
         {            
@@ -150,6 +147,8 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
             float paintColorR = (float)stream.ReceiveNext();
             float paintColorG = (float)stream.ReceiveNext();
             float paintColorB = (float)stream.ReceiveNext();
+
+            //this.GetComponent<Player>().solverGameObject = (GameObject)stream.ReceiveNext();
             
             
 
@@ -166,6 +165,8 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
             this.GetComponent<Player>().playerColor = new Color(playerColorR, playerColorG, playerColorB, 1);
 
             this.GetComponent<Player>().paintColor = new Color(paintColorR, paintColorG, paintColorB, 1);
+
+            
 
         }
     }

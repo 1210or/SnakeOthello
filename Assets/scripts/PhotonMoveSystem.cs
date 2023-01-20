@@ -10,7 +10,7 @@ public class PhotonMoveSystem : MonoBehaviourPunCallbacks
     {
         
     }
-        float speed = 0.05f;
+        float speed = 3f;
     // Update is called once per frame
     void Update()
     {
@@ -19,7 +19,7 @@ public class PhotonMoveSystem : MonoBehaviourPunCallbacks
             float x = Input.GetAxis("Horizontal");
             float z = Input.GetAxis("Vertical");
 
-            transform.position += new Vector3(x * speed, 0, z*0.5f* speed);
+            transform.position += new Vector3(x * speed * Time.deltaTime, 0, z*0.5f* speed * Time.deltaTime);
         }
         
     }

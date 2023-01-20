@@ -62,7 +62,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         //時間制限と勝敗
         if(totalTime != 0){
 
-            if(totalTime > 0){//ゲーム中
+            if(totalTime > 1){//ゲーム中
                 //ゲームタイマー                
                 totalTime -= Time.deltaTime;                
                 seconds = (int)totalTime;
@@ -70,34 +70,34 @@ public class GameManager : MonoBehaviourPunCallbacks
                 //print(seconds.ToString());  
             }else{//ゲーム終了
 
-            //一回だけ処理
-            if(isFinished != true){
-                //勝ち負け判定
-                for(int z=0;z<StageManager.stageObject.GetLength(0);z++) //zの大きさぶんループ
-                {
-                    for(int x=0;x<StageManager.stageObject.GetLength(1);x++)//xの大きさぶんループ
+                //一回だけ処理
+                if(isFinished != true){
+                    //勝ち負け判定
+                    for(int z=0;z<StageManager.stageObject.GetLength(0);z++) //zの大きさぶんループ
                     {
-                        totalPowerCount += StageManager.stageObject[x,z].GetComponent<Stage>().stagePowerValue;
+                        for(int x=0;x<StageManager.stageObject.GetLength(1);x++)//xの大きさぶんループ
+                        {
+                            totalPowerCount += StageManager.stageObject[x,z].GetComponent<Stage>().stagePowerValue;
+                        }
                     }
-                }
 
-                finishText.SetActive(true);
-                if(totalPowerCount > 0){
-                    GameObject.Find ("winMessage").GetComponent<Text>().text = "Player1 is winner.";
-                    //print("赤の勝ち");
+                    finishText.SetActive(true);
+                    if(totalPowerCount > 0){
+                        GameObject.Find ("winMessage").GetComponent<Text>().text = "Player1 is winner.";
+                        //print("赤の勝ち");
+                    }
+                    if(totalPowerCount < 0){
+                        GameObject.Find ("winMessage").GetComponent<Text>().text = "Player2 is winner.";
+                        //print("青の勝ち");
+                    }            
+                    if(totalPowerCount == 0){
+                        GameObject.Find ("winMessage").GetComponent<Text>().text = "Draw.";
+                        //print("引き分け");
+                    }
+                    
+                    
+                    isFinished = true;
                 }
-                if(totalPowerCount < 0){
-                    GameObject.Find ("winMessage").GetComponent<Text>().text = "Player2 is winner.";
-                    //print("青の勝ち");
-                }            
-                if(totalPowerCount == 0){
-                    GameObject.Find ("winMessage").GetComponent<Text>().text = "Draw.";
-                    //print("引き分け");
-                }
-                
-                
-                isFinished = true;
-            }
 
                 
             }
