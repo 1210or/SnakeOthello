@@ -17,6 +17,7 @@ public class PhotonMoveSystem : MonoBehaviourPunCallbacks
     // Update is called once per frame
     void Update()
     {
+
         if(photonView.IsMine){
             // WASD入力から、XZ平面(水平な地面)を移動する方向(velocity)を得ます
             inputKey = Vector3.zero;
@@ -33,9 +34,9 @@ public class PhotonMoveSystem : MonoBehaviourPunCallbacks
             //移動の向きなど座標関連はVector3で扱う
             Vector3 velocity = new Vector3(inputKey.x, 0, inputKey.z).normalized;
 
-            //45度を30度に変換 角度だからそのままベクトルにかけれない
-            float convertRot = (0.125f * Mathf.Cos(4 * (Mathf.Atan2(velocity.z, velocity.x))) + 0.875f);            
-            
+            //45度を30度に変換
+            float convertRot = ((1-Mathf.Tan(Mathf.PI/6))/2) * (Mathf.Cos(4 * (Mathf.Atan2(velocity.z, velocity.x)))+1) + Mathf.Tan(Mathf.PI/6);
+
             //ベクトルの向きを取得 //zに角度変換をかける
             Vector3 direction = new Vector3(inputKey.x, 0, inputKey.z * convertRot).normalized;
            
@@ -46,8 +47,11 @@ public class PhotonMoveSystem : MonoBehaviourPunCallbacks
             
             //移動先に向けて回転
             transform.LookAt(destination);
-            //移動先の座標を設定
-            transform.position = destination;
+            
+            //プレイ中なら  移動先の座標を設定
+            if(GameManager.instance.isPlaying == true || GameManager.instance.isDebug == true){
+                transform.position = destination;
+            }
         }
         
     }

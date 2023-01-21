@@ -12,7 +12,7 @@ public class StageManager : MonoBehaviour
   public GameObject cam; //カメラを格納
 
   [SerializeField, Range(1, 100)]//スライダ
-  public static int stageSizeX = 5; //x方向のステージの大きさ
+  public static int stageSizeX = 10; //x方向のステージの大きさ
 
   public static int stageSizeZ = stageSizeX; //z方向のステージの大きさ
   
@@ -142,6 +142,22 @@ public class StageManager : MonoBehaviour
           if(stageObjectFromEdge[i].GetComponent<Stage>().stagePowerValue == 1-(2*p)){      
             stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[p] = 0; //                                                  
           }  
+        }
+
+        //プレイヤーのいるマスの走査値を0にする
+        GameObject[] tempPlayerList = GameObject.FindGameObjectsWithTag("Player");
+        for(int i=0; i<tempPlayerList.Length; i++){
+          // 現在の位置から下(0,-1,0)に向かってRayをセット
+          Ray ray = new Ray(tempPlayerList[i].transform.position + new Vector3(0,0.1f,0),Vector3.down);
+          // Rayが当たった相手を保存する変数
+          RaycastHit hit;
+          // Rayを10.0fの距離まで発射。何かに当たればhitで受け取る
+          if(Physics.Raycast(ray, out hit, 10.0f)) {
+            // もし当たった相手のタグがstageなら下の足場の色を変える
+            if(hit.collider.tag == "stage") {
+              hit.collider.gameObject.GetComponent<Stage>().stageScanFlag[p] = 0;
+            }
+          }
         }
 
         //塗り潰す

@@ -58,7 +58,7 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
             // もし当たった相手のタグがstageなら下の足場の色を変える
             if(hit.collider.tag == "stage") {
                 //プレイヤーが2人ならステージパワー値を変更
-                if(PhotonNetwork.PlayerList.Length == 2){ 
+                if(PhotonNetwork.PlayerList.Length == 2 || GameManager.instance.isDebug == true){ 
                 
                     //もし直前のステージと足元のステージが違うならば(新しいマスに入ったら)
                     if(hit.collider.gameObject.GetComponent<Stage>().stagePowerValue != playerPowerValue){

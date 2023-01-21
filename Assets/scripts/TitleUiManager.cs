@@ -8,7 +8,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 
-public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
+public class TitleUiManager : MonoBehaviourPunCallbacks, IPunObservable
 {
     //タイマーのための変数
     [SerializeField, Range(0, 100)]
@@ -32,7 +32,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     //スコアのための変数
     public int totalPowerCount = 0;
 
-    public static GameManager instance;
+    public static TitleUiManager instance;
 
     // Start is called before the first frame update
     void Awake()
@@ -52,10 +52,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         //ロビー接続
         PhotonNetwork.JoinLobby();
         messageText.GetComponent<Text>().text = "Connecting...";
-
-
-        // "Room"という名前のルームに参加する（ルームが存在しなければ作成して参加する）
-        //PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions(), TypedLobby.Default);
     }
 
     //ロビー接続時に呼ばれるコールバック
