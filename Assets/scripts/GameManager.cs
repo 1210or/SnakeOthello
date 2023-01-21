@@ -73,10 +73,21 @@ public class GameManager : MonoBehaviourPunCallbacks
                 //一回だけ処理
                 if(isFinished != true){
                     //勝ち負け判定
+                    int player1Sum = 0;
+                    int player2Sum = 0;
                     for(int z=0;z<StageManager.stageObject.GetLength(0);z++) //zの大きさぶんループ
                     {
                         for(int x=0;x<StageManager.stageObject.GetLength(1);x++)//xの大きさぶんループ
                         {
+                            //スコアカウント
+                            if(StageManager.stageObject[x,z].GetComponent<Stage>().stagePowerValue > 0){
+                                player1Sum += StageManager.stageObject[x,z].GetComponent<Stage>().stagePowerValue;
+                            }
+                            if(StageManager.stageObject[x,z].GetComponent<Stage>().stagePowerValue < 0){
+                                player2Sum -= StageManager.stageObject[x,z].GetComponent<Stage>().stagePowerValue;
+                            }
+
+                            //勝ち負け判定
                             totalPowerCount += StageManager.stageObject[x,z].GetComponent<Stage>().stagePowerValue;
                         }
                     }
@@ -94,7 +105,8 @@ public class GameManager : MonoBehaviourPunCallbacks
                         GameObject.Find ("winMessage").GetComponent<Text>().text = "Draw.";
                         //print("引き分け");
                     }
-                    
+
+                    timerCountText.GetComponent<Text>().text = ("Player1: " + player1Sum + "/" + "Player2: " + player2Sum);
                     
                     isFinished = true;
                 }

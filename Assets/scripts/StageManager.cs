@@ -12,7 +12,7 @@ public class StageManager : MonoBehaviour
   public GameObject cam; //カメラを格納
 
   [SerializeField, Range(1, 100)]//スライダ
-  public static int stageSizeX = 10; //x方向のステージの大きさ
+  public static int stageSizeX = 5; //x方向のステージの大きさ
 
   public static int stageSizeZ = stageSizeX; //z方向のステージの大きさ
   
