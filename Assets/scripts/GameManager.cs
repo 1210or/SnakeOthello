@@ -44,23 +44,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         {
             instance = this;
         }   
-     }
-
-    // マスターサーバーへの接続が成功した時に呼ばれるコールバック
-    public override void OnConnectedToMaster()
-    {
-        //ロビー接続
-        PhotonNetwork.JoinLobby();
-        messageText.GetComponent<Text>().text = "Connecting...";
-
-
-        // "Room"という名前のルームに参加する（ルームが存在しなければ作成して参加する）
-        //PhotonNetwork.JoinOrCreateRoom("Room", new RoomOptions(), TypedLobby.Default);
-    }
-
-    //ロビー接続時に呼ばれるコールバック
-    public override void OnJoinedLobby(){
-        messageText.GetComponent<Text>().text = "Joined lobby";
     }
 
     
@@ -76,8 +59,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         if (Input.GetKeyDown(KeyCode.Escape))
             Application.Quit();
 
-    //プレイヤーが2人揃ったら始動
-    if(PhotonNetwork.PlayerList.Length == 2 && isDebug == false){   
+        //プレイヤーが2人揃ったら始動
+        if(PhotonNetwork.PlayerList.Length == 2 && isDebug == false){   
 
         //時間制限と勝敗
         if(totalTime != 0){
@@ -143,8 +126,10 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
 
         
-        for(int i = 0; i < playersList.Count; i++){ //プレイヤーの人数分まわす
-            if(playersList[i].GetComponent<Player>().newHexaFlag == true){
+        for(int i = 0; i < playersList.Count; i++) //プレイヤーの人数分まわす
+        {
+            if(playersList[i].GetComponent<Player>().newHexaFlag == true)
+            {
                 //print("どちらかがマスを移動した");
                 break;
             }
@@ -212,27 +197,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     public void Close()
     {
 
-    }
-
-    //ボタンから呼び出される
-    public void OpenCreateRoomPanel()
-    {
-        createRoomPanel.SetActive(true);
-    }
-    
-    //入力テキストから部屋を作る
-    public void CreateRoomButton()
-    {
-        if(!string.IsNullOrEmpty(enterRoomName.text))
-        {
-            RoomOptions options = new RoomOptions();
-            options.MaxPlayers = 2;
-
-            //ルーム作成
-            PhotonNetwork.CreateRoom(enterRoomName.text,options);
-
-            messageText.GetComponent<Text>().text = "Creating a new room...";
-        }
     }
 
     //ボタンから呼び出される
