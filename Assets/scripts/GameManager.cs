@@ -46,10 +46,40 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         }   
     }
 
+    void Start() {                                 
+            int i = PhotonNetwork.LocalPlayer.ActorNumber - 1;            
+            
+            //初期位置を格納
+            Vector3 firstPosition = StageManager.stageObject[i * (StageManager.stageSizeX - 1),i * (StageManager.stageSizeZ - 1)].transform.position;
+            
+            //プレイヤーの人スタンスを生成
+            GameObject player = PhotonNetwork.Instantiate("Player", firstPosition + new Vector3(0, 2, 0) , new Quaternion(1,0,0,180)); 
+
+            
+            //初期位置を決める
+            player.GetComponent<Player>().firstPosition = firstPosition;
+
+            //プレイヤーの名前を変える
+            player.name = "Player" + (i + 1) as string;
+
+            //プレイヤーの属性(チーム)を決める
+            player.GetComponent<Player>().playerPowerValue =  1 - (i*2); //1人目が1, 2人めが-1になる
+
+            //初期位置のステージにパワー値を設定
+            //StageManager.stageObject[i * (StageManager.stageSizeX - 1),i * (StageManager.stageSizeZ - 1)].GetComponent<Stage>().stagePowerValue = player.GetComponent<Player>().playerPowerValue;
+ 
+            //プレイヤーのチーム色を決める
+            player.GetComponent<Player>().teamColor = new Color(1-i,0, i); //1人目は赤, 2人目は青
+
+            //プレイヤー自身の色を変える
+            player.GetComponent<Player>().playerColor = player.GetComponent<Player>().teamColor * 0.4f + new Color(0.7f, 0.7f, 0.7f);
+                
+            //プレイヤーのマスの色を決める
+            player.GetComponent<Player>().paintColor = player.GetComponent<Player>().teamColor * 0.3f + new Color(0.1f, 0.1f, 0.1f);
+    }
     
     public bool isFinished = false;
     public bool isPlaying = false;
-
     public bool isDebug = true;
     
     // Update is called once per frame
@@ -138,44 +168,6 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     // ゲームサーバーへの接続が成功した時に呼ばれるコールバック
     public override void OnJoinedRoom()
     {    
-        //プレイヤーの人数が2人以下なら
-        if(PhotonNetwork.PlayerList.Length < 3){
-            
-            //配列のインデックスをプレイヤーの人数から定義
-            int i = PhotonNetwork.PlayerList.Length - 1;
-            
-            //初期位置を格納
-            Vector3 firstPosition = StageManager.stageObject[i * (StageManager.stageSizeX - 1),i * (StageManager.stageSizeZ - 1)].transform.position;
-            
-            //プレイヤーの人スタンスを生成
-            GameObject player = PhotonNetwork.Instantiate("Player", firstPosition + new Vector3(0, 2, 0) , new Quaternion(1,0,0,180)); 
-
-            
-            //初期位置を決める
-            player.GetComponent<Player>().firstPosition = firstPosition;
-
-            //これが同期されていない
-            playersList.Add(player);
-
-            //プレイヤーの名前を変える
-            player.name = "Player" + (i + 1) as string;
-
-            //プレイヤーの属性(チーム)を決める
-            player.GetComponent<Player>().playerPowerValue =  1 - (i*2); //1人目が1, 2人めが-1になる
-
-            //初期位置のステージにパワー値を設定
-            //StageManager.stageObject[i * (StageManager.stageSizeX - 1),i * (StageManager.stageSizeZ - 1)].GetComponent<Stage>().stagePowerValue = player.GetComponent<Player>().playerPowerValue;
- 
-            //プレイヤーのチーム色を決める
-            player.GetComponent<Player>().teamColor = new Color(1-i,0, i); //1人目は赤, 2人目は青
-
-            //プレイヤー自身の色を変える
-            player.GetComponent<Player>().playerColor = player.GetComponent<Player>().teamColor * 0.4f + new Color(0.7f, 0.7f, 0.7f);
-                
-            //プレイヤーのマスの色を決める
-            player.GetComponent<Player>().paintColor = player.GetComponent<Player>().teamColor * 0.3f + new Color(0.1f, 0.1f, 0.1f);
-
-        }
     }
 
     //名前空間、継承、コンポーネントアタッチ必須

@@ -5,7 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 
 public class Player : MonoBehaviourPunCallbacks, IPunObservable
-{
+{    
     //プレイヤーの属性(チーム)のための変数
     public int playerPowerValue = 0;
 
@@ -36,9 +36,11 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    public int playerID;
     // Start is called before the first frame update
     void Start()
     {
+        playerID = PhotonNetwork.LocalPlayer.ActorNumber - 1;
         //プレイヤーの子供オブジェクトの色を変える
         this.transform.Find("player").gameObject.GetComponent<Renderer>().material.color = playerColor;
     }

@@ -362,6 +362,7 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
     //遷移関数
     public void PlayGame()
     {
+        //mainシーンへ遷移
         PhotonNetwork.LoadLevel(levelToPlay);
     }
 

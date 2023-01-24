@@ -45,6 +45,7 @@ public class StageManager : MonoBehaviour
         {
       
            //オブジェクトをインスタンスコピー
+           //普通のインスタンスだから、ステージを監視できてない
           stageObject[x,z] = Instantiate(hexagon, new Vector3(hexSizeX *  x + z * 0.5f * hexSizeX, 0, z * hexSizeZ ) , new Quaternion(1,0,0,-1));
           
           //オブジェクトの名前変更
