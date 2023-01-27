@@ -33,15 +33,14 @@ public int[] stageScanFlag = new int[]{1,-1};
     void Update()
     {
       
-      if(PhotonNetwork.PlayerList.Length > 0){
+      if(GameManager.instance.isPlaying == true){
         
-        if(this.stagePowerValue != 0){
+        if(this.stagePowerValue != 0){ 
           //ステージのパワー値が変わったら色を変更する
           //playerListが同期されていない
-          //this.GetComponent<Renderer>().material.color = GameManager.instance.playersList[(int)(-0.5f*(this.stagePowerValue-1))].GetComponent<Player>().paintColor;
           
-          //とりあえず赤と青にしてる本当は上のコードで書きたい
-          this.GetComponent<Renderer>().material.color = new Color(0.5f*(this.stagePowerValue+1),0,-0.5f*(this.stagePowerValue-1));
+          this.GetComponent<Renderer>().material.color = GameManager.instance.playerArray[(int)(-0.5f*(this.stagePowerValue-1))].GetComponent<Player>().paintColor;
+
         }
         
       }

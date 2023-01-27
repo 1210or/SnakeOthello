@@ -105,14 +105,20 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
     //入力テキストから部屋を作る
     public void CreateRoomButton()
     {
-        if(!string.IsNullOrEmpty(enterRoomName.text))
-        {
-            //ルームのオプションをインスタンス化して変数に入れる 
+        //ルームのオプションをインスタンス化して変数に入れる 
             RoomOptions options = new RoomOptions();
             options.MaxPlayers = 2;// プレイヤーの最大参加人数の設定（無料版は20まで。1秒間にやり取りできるメッセージ数に限りがあるので10以上は難易度上がる）
 
+        if(!string.IsNullOrEmpty(enterRoomName.text)) ///入力文字がエンプティじゃなければ
+        {
+            
             //ルームを作る(ルーム名：部屋の設定)
             PhotonNetwork.CreateRoom(enterRoomName.text, options);
+
+        }else
+        {
+            // ユニークなルーム名を自動生成してルームを作成する
+            PhotonNetwork.CreateRoom(null, options);
 
             messageText.GetComponent<Text>().text = "Creating a new room...";
         }
@@ -359,7 +365,7 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
         }
     }
 
-    //遷移関数
+    //遷移関数、ボタンから呼び出される
     public void PlayGame()
     {
         //mainシーンへ遷移

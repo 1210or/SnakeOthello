@@ -8,7 +8,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 
-public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
+public class GameManager : MonoBehaviourPunCallbacks
 {
     //タイマーのための変数
     [SerializeField, Range(0, 100)]
@@ -26,8 +26,8 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
 
     //プレイヤー作成のための変数
     public GameObject player;
-    public GameObject[] players = new GameObject[2];
-    public List<GameObject> playersList = null;
+    public GameObject[] playerArray = new GameObject[2];
+    //public List<GameObject> playersList = null;
 
     //スコアのための変数
     public int totalPowerCount = 0;
@@ -55,12 +55,12 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
             //プレイヤーの人スタンスを生成
             GameObject player = PhotonNetwork.Instantiate("Player", firstPosition + new Vector3(0, 2, 0) , new Quaternion(1,0,0,180)); 
 
-            
             //初期位置を決める
             player.GetComponent<Player>().firstPosition = firstPosition;
 
+            //これが同期されていない   
             //プレイヤーの名前を変える
-            player.name = "Player" + (i + 1) as string;
+            player.name = "Player" + (i + 1) as string; 
 
             //プレイヤーの属性(チーム)を決める
             player.GetComponent<Player>().playerPowerValue =  1 - (i*2); //1人目が1, 2人めが-1になる
@@ -76,10 +76,15 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 
             //プレイヤーのマスの色を決める
             player.GetComponent<Player>().paintColor = player.GetComponent<Player>().teamColor * 0.3f + new Color(0.1f, 0.1f, 0.1f);
+
+            //コルーチン、ゲーム上にプレイヤータグがついた人が2人になったら配列に入れる。同期せずそれぞれで実行
+            StartCoroutine(addPlayerArray());
+
     }
     
     public bool isFinished = false;
     public bool isPlaying = false;
+
     public bool isDebug = true;
     
     // Update is called once per frame
@@ -96,7 +101,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
         if(totalTime != 0){
 
             if(totalTime > 1){//ゲーム中
-                isPlaying = true;
+
                 //ゲームタイマー                
                 totalTime -= Time.deltaTime;                
                 seconds = (int)totalTime;
@@ -155,7 +160,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     }
 
 
-        
+        /*
         for(int i = 0; i < playersList.Count; i++) //プレイヤーの人数分まわす
         {
             if(playersList[i].GetComponent<Player>().newHexaFlag == true)
@@ -163,27 +168,7 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
                 //print("どちらかがマスを移動した");
                 break;
             }
-        }
-    }
-    // ゲームサーバーへの接続が成功した時に呼ばれるコールバック
-    public override void OnJoinedRoom()
-    {    
-    }
-
-    //名前空間、継承、コンポーネントアタッチ必須
-    void IPunObservable.OnPhotonSerializeView( PhotonStream stream, PhotonMessageInfo i_info)
-    {
-        if(stream.IsWriting )
-        {
-            //データの送信
-            //ステージパワー値
-            //stream.SendNext(playersList);        
-        }
-        else
-        {            
-            //データの受信
-            //playersList = (List)stream.ReceiveNext();            
-        }
+        }*/
     }
 
     public void Close()
@@ -194,6 +179,34 @@ public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
     //ボタンから呼び出される
     public void Retry()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    IEnumerator addPlayerArray(){
+
+        //2人揃うまで待つ
+        yield return new WaitUntil(() => GameObject.FindGameObjectsWithTag("Player").Length == 2);
+        
+        //プレイヤーを配列に入れる
+        GameObject[] tempPlayerArray = GameObject.FindGameObjectsWithTag("Player");
+
+        for(int j=0; j<tempPlayerArray.Length; j++)
+        {
+            if(tempPlayerArray[j].GetComponent<Player>().playerPowerValue == 1 - (j*2))//タグ検索で取得したプレイヤーの配列の順番が正しいかを判定する
+            {
+                playerArray[j] =  tempPlayerArray[j];                
+            }else //正しくなければ順番を入れ替える
+            {
+                playerArray[j] =  tempPlayerArray[1-j];                
+            }
+        }
+
+        for(int j=0; j<playerArray.Length; j++)
+        {
+            playerArray[j].name = "Player_" + j as string;
+        }
+
+        //ゲーム開始
+        isPlaying = true;
     }
 }

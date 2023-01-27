@@ -420,10 +420,9 @@ MonoBehaviour:
   createRoomPanel: {fileID: 0}
   enterRoomName: {fileID: 0}
   player: {fileID: 1339817059557221371, guid: 8f733ce51ccea4c24b17970aba836f4b, type: 3}
-  players:
+  playerArray:
   - {fileID: 0}
   - {fileID: 0}
-  playersList: []
   totalPowerCount: 0
   isFinished: 0
   isPlaying: 0
