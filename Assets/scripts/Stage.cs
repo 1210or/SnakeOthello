@@ -26,26 +26,39 @@ public int[] stageScanFlag = new int[]{1,-1};
     // Start is called before the first frame update
     void Start()
     {        
-        
+      int x = this.GetComponent<Stage>().stageIndexX;
+      int z = this.GetComponent<Stage>().stageIndexZ;
+      //オブジェクトの名前変更
+      this.name = "hexagon" + x + "_" + z;
+
+      //親設定
+      this.transform.parent = GameObject.Find ("StageHexagons").transform;
+
+      //配列に入れる
+      StageManager.instance.stageObject[x, z] = this.gameObject;
+
+      
+          //ステージの端を定義
+      if(x == 0 || z == 0 || x == StageManager.stageSizeX - 1 || z == StageManager.stageSizeZ -1)
+      {
+        this.GetComponent<Stage>().isEdge = true;            
+      }
+
+      this.GetComponent<Renderer>().material.color = new Color(0.5f, 0.5f, 0.5f);
+      
+
+
     }
 
     // Update is called once per frame
     void Update()
-    {
-      
-      if(GameManager.instance.isPlaying == true){
-        
+    {      
+      if(GameManager.instance.isPlaying == true){        
         if(this.stagePowerValue != 0){ 
           //ステージのパワー値が変わったら色を変更する
-          //playerListが同期されていない
-          
           this.GetComponent<Renderer>().material.color = GameManager.instance.playerArray[(int)(-0.5f*(this.stagePowerValue-1))].GetComponent<Player>().paintColor;
-
-        }
-        
-      }
-      
-      
+        }        
+      }            
     }
 
       //引数に入れたゲームオブジェクト(ステージ)の接するステージを配列にして返す
@@ -55,12 +68,12 @@ public int[] stageScanFlag = new int[]{1,-1};
             List<GameObject> arroundHexagons = new List<GameObject>();
             
             //左下から反時計回り
-            try{arroundHexagons.Add(StageManager.stageObject[x,z-1]);}catch (System.Exception){/*何もしない*/} //左下
-            try{arroundHexagons.Add(StageManager.stageObject[x+1,z-1]);}catch (System.Exception){/*何もしない*/} //下
-            try{arroundHexagons.Add(StageManager.stageObject[x+1,z]);}catch (System.Exception){/*何もしない*/} //右下
-            try{arroundHexagons.Add(StageManager.stageObject[x,z+1]);}catch (System.Exception){/*何もしない*/} //右上
-            try{arroundHexagons.Add(StageManager.stageObject[x-1,z+1]);}catch (System.Exception){/*何もしない*/} //上
-            try{arroundHexagons.Add(StageManager.stageObject[x-1,z]);}catch (System.Exception){/*何もしない*/} //左上
+            try{arroundHexagons.Add(StageManager.instance.stageObject[x,z-1]);}catch (System.Exception){/*何もしない*/} //左下
+            try{arroundHexagons.Add(StageManager.instance.stageObject[x+1,z-1]);}catch (System.Exception){/*何もしない*/} //下
+            try{arroundHexagons.Add(StageManager.instance.stageObject[x+1,z]);}catch (System.Exception){/*何もしない*/} //右下
+            try{arroundHexagons.Add(StageManager.instance.stageObject[x,z+1]);}catch (System.Exception){/*何もしない*/} //右上
+            try{arroundHexagons.Add(StageManager.instance.stageObject[x-1,z+1]);}catch (System.Exception){/*何もしない*/} //上
+            try{arroundHexagons.Add(StageManager.instance.stageObject[x-1,z]);}catch (System.Exception){/*何もしない*/} //左上
 
           return arroundHexagons;
     }
@@ -77,9 +90,7 @@ public int[] stageScanFlag = new int[]{1,-1};
         //arroundHexagons関数を使ってthis.gameObjectの隣接するヘキサゴンを取得
         arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().stagePowerValue = stagePowerValue;
         arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Renderer>().material.color = color;
-
       }
-
     }
 
 //名前空間、継承、コンポーネントアタッチ必須
@@ -89,12 +100,23 @@ public int[] stageScanFlag = new int[]{1,-1};
         {
             //データの送信
             //ステージパワー値
-            stream.SendNext((int)this.GetComponent<Stage>().stagePowerValue);        
+            stream.SendNext((int)this.GetComponent<Stage>().stagePowerValue);  
+
+            //インデックス
+            stream.SendNext((int)this.GetComponent<Stage>().stageIndexX);
+            stream.SendNext((int)this.GetComponent<Stage>().stageIndexZ);  
+
+            stream.SendNext((int)this.GetComponent<Stage>().distanceFromEdge);
         }
         else
         {            
             //データの受信
-            this.GetComponent<Stage>().stagePowerValue = (int)stream.ReceiveNext();            
+            this.GetComponent<Stage>().stagePowerValue = (int)stream.ReceiveNext();  
+            
+            this.GetComponent<Stage>().stageIndexX = (int)stream.ReceiveNext();  
+            this.GetComponent<Stage>().stageIndexZ = (int)stream.ReceiveNext();
+
+            this.GetComponent<Stage>().distanceFromEdge = (int)stream.ReceiveNext();
         }
     }
 }

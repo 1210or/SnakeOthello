@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Diagnostics; 
+using Photon.Pun;
+using Photon.Realtime;
 
 
 
@@ -17,7 +19,7 @@ public class StageManager : MonoBehaviour
   public static int stageSizeZ = stageSizeX; //z方向のステージの大きさ
   
   public float[,] stagePosition = new float[stageSizeX,stageSizeZ]; //座標のための配列、ステージの大きさを決めて配列のサイズにする
-  public static GameObject[,] stageObject = new GameObject[stageSizeX,stageSizeZ];//ゲームオブジェクトが入っている配列
+  public GameObject[,] stageObject = new GameObject[stageSizeX,stageSizeZ];//ゲームオブジェクトが入っている配列
   
   //ステージのx方向の大きさはcos30の2倍
   public  static float hexSizeX = MathF.Cos(MathF.PI/6);
@@ -28,91 +30,46 @@ public class StageManager : MonoBehaviour
   public GameObject stageParent;
 
     //ステージの周の数
-   public static int ringsCount;
+   public int ringsCount;
 
    //ステージ端から近い順にオブジェクト
    public List<GameObject> stageObjectFromEdge;
 
-  
+    public static StageManager instance;
+    
     // Start is called before the first frame update
     void Awake()
     {    
-      
+      if (PhotonNetwork.IsMasterClient) {
       //プレファブを並べる 
       for(int z=0;z<stageSizeZ;z++) //zの大きさぶんループ
       {
         for(int x=0;x<stageSizeX;x++)//xの大きさぶんループ
-        {
-      
-           //オブジェクトをインスタンスコピー
-           //普通のインスタンスだから、ステージを監視できてない
-          stageObject[x,z] = Instantiate(hexagon, new Vector3(hexSizeX *  x + z * 0.5f * hexSizeX, 0, z * hexSizeZ ) , new Quaternion(1,0,0,-1));
-          
-          //オブジェクトの名前変更
-          stageObject[x,z].name = "hexagon" + x + "_" + z;
-          stageObject[x,z].transform.parent = stageParent.transform;
+        {      
+           // "RoomObject"プレハブからルームオブジェクトを生成する
+          stageObject[x,z] = PhotonNetwork.InstantiateRoomObject("stageHexa", new Vector3(hexSizeX *  x + z * 0.5f * hexSizeX, 0, z * hexSizeZ ) , new Quaternion(1,0,0,-1));
 
           //インデックス情報を付与
           stageObject[x,z].GetComponent<Stage>().stageIndexX = x;
-          stageObject[x,z].GetComponent<Stage>().stageIndexZ = z;
-
-          //色を変える
-          stageObject[x,z].GetComponent<Renderer>().material.color = new Color(0.5f, 0.5f, 0.5f);
-
-          //ステージの端を定義
-          if(x == 0 || z == 0 || x == stageSizeX - 1 || z == stageSizeZ -1)
-          {
-            stageObject[x,z].GetComponent<Stage>().isEdge = true;            
-          }
-          
+          stageObject[x,z].GetComponent<Stage>().stageIndexZ = z;          
         }
         
-      }
+      } 
 
-      //ステージを回転させる
-      stageParent.transform.rotation = Quaternion.Euler(0, 30, 0);
-
-      //ステージの中心を探す
-      Vector3 stageCenter = (stageObject[0,0].transform.position + stageObject[(stageSizeX-1),(stageSizeZ-1)].transform.position)/2;
-      
-      //ステージのサイズに合わせてカメラを動かす
-      cam.transform.position = stageCenter + new Vector3(0, 0, 1.8f);
-
-      //プレファブを非アクティブにする
-      //hexagon.transform.root.gameObject.SetActive (false);
 
       //周の数
-      ringsCount = (int)((stageSizeX+1)/2);
+      ringsCount = (int)((StageManager.stageSizeX+1)/2);
 
-      //エッジからの距離を計算
-      for(int r=0; r<ringsCount; r++){
-
-        for(int z=0; z<stageSizeZ-(2*r); z++) //zの大きさぶんループ
-        {
-          stageObject[r, r+z].GetComponent<Stage>().distanceFromEdge = r;
-          stageObject[stageSizeZ-r-1, r+z].GetComponent<Stage>().distanceFromEdge = r;
-
-          for(int x=0; x<stageSizeX-(2*r); x++)//xの大きさぶんループ
-          {
-            //ステージの距離を格納
-            stageObject[r+x, r].GetComponent<Stage>().distanceFromEdge = r;
-            stageObject[r+x, stageSizeX-r-1].GetComponent<Stage>().distanceFromEdge = r;
-          }
-        }
+      
       }
 
-      //エッジから近い順にリストに追加
-      for(int r=0; r<ringsCount; r++){
-        for(int z=0;z<stageSizeZ;z++) //zの大きさぶんループ
-        {
-          for(int x=0;x<stageSizeX;x++)//xの大きさぶんループ
-          {
-            if(stageObject[x,z].GetComponent<Stage>().distanceFromEdge == r){
-              stageObjectFromEdge.Add(stageObject[x,z]);
-            }
-          }
-        }
-      }
+
+   
+ //インスタンス化
+    if(instance == null)
+    {
+        instance = this;
+    }
 
     }
 
