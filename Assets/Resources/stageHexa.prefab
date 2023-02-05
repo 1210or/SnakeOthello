@@ -118,6 +118,7 @@ MonoBehaviour:
   isEdge: 0
   distanceFromEdge: 0
   isPlayerOn: 0
+  defaultStageColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
   stagePowerValue: 0
   stageScanFlag: 01000000ffffffff
 --- !u!114 &-1692420760290101528

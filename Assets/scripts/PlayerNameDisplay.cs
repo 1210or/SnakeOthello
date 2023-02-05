@@ -9,7 +9,7 @@ public class PlayerNameDisplay : MonoBehaviourPunCallbacks
     private void Start()
     {                
         var nameLabel = this.GetComponent<Text>();
-        nameLabel.text = photonView.Owner.NickName + "_" + ((int)(photonView.OwnerActorNr)-1);
+        nameLabel.text = photonView.Owner.NickName;
     }    
 
     void Update()

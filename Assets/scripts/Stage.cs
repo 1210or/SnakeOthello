@@ -17,6 +17,8 @@ public int distanceFromEdge = 0;
 
 public bool isPlayerOn = false;
 
+public Color defaultStageColor = new Color(0.9f, 0.9f, 0.9f);
+
 //どちら陣営か判定 +1はプレイヤー1、-1はプレイヤー2
 public int stagePowerValue = 0; 
 
@@ -38,26 +40,26 @@ public int[] stageScanFlag = new int[]{1,-1};
       StageManager.instance.stageObject[x, z] = this.gameObject;
 
       
-          //ステージの端を定義
+      //ステージの端を定義
       if(x == 0 || z == 0 || x == StageManager.stageSizeX - 1 || z == StageManager.stageSizeZ -1)
       {
         this.GetComponent<Stage>().isEdge = true;            
       }
 
-      this.GetComponent<Renderer>().material.color = new Color(0.5f, 0.5f, 0.5f);
-      
-
-
+      this.GetComponent<Renderer>().material.color = defaultStageColor;
     }
 
     // Update is called once per frame
     void Update()
     {      
-      if(GameManager.instance.isPlaying == true){        
+      if(GameManager.instance.isPlaying == true || GameManager.instance.isDebug == true){        
         if(this.stagePowerValue != 0){ 
           //ステージのパワー値が変わったら色を変更する
           this.GetComponent<Renderer>().material.color = GameManager.instance.playerArray[(int)(-0.5f*(this.stagePowerValue-1))].GetComponent<Player>().paintColor;
-        }        
+        }else
+        {
+          this.GetComponent<Renderer>().material.color = defaultStageColor;
+        }     
       }            
     }
 

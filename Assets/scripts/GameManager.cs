@@ -22,6 +22,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     public GameObject messageText;
     public GameObject createRoomPanel;
     public Text enterRoomName;
+
+    public GameObject resetPowerValueButton;
     
     
 
@@ -35,11 +37,11 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public static GameManager instance;
 
+
+
     // Start is called before the first frame update
     void Awake()
-    {   // PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
-        PhotonNetwork.ConnectUsingSettings();        
-
+    {          
         //インスタンス生成
         if (instance == null)
         {
@@ -49,8 +51,11 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     void Start() {                                 
         
-        //1秒後に開始
+        //3秒後に開始
         StartCoroutine(JustBeforeGameStart());
+        
+        //if(isDebug==true)
+        //resetPowerValueButton.SetActive(true);
 
         //ゲーム終了動作
         //コルーチン、isFinished==trueまで
@@ -80,32 +85,15 @@ public class GameManager : MonoBehaviourPunCallbacks
                     totalTime -= Time.deltaTime;                
                     seconds = (int)totalTime;
                     messageText.GetComponent<Text>().text = ("Last " + seconds.ToString() + " second");
-                    //print(seconds.ToString());  
+
                 }else{//ゲーム終了                
                     isPlaying = false;
                     isFinished = true;          
                 }
             }            
         }
-
-         /*
-        for(int i = 0; i < playersList.Count; i++) //プレイヤーの人数分まわす
-        {
-            if(playersList[i].GetComponent<Player>().newHexaFlag == true)
-            {
-                //print("どちらかがマスを移動した");
-                break;
-            }
-        }*/
     }
        
-     
-
-    public void Close()
-    {
-
-    }
-
     IEnumerator JustBeforeGameStart()
     {  
         //本当は配列の中にnullがなくなるまでのコルーチンを作りたかったが二重配列の中を調べるのが複雑だった。
@@ -125,12 +113,9 @@ public class GameManager : MonoBehaviourPunCallbacks
             
         //コルーチン、ゲーム上にプレイヤータグがついた人が2人になったら配列に入れる。同期せずそれぞれで実行
         StartCoroutine(AddPlayerArray());
-
-        
+  
         //ステージ回転させないと見栄えが悪いから隠す
         GameObject.Find ("GameLoadingPanel").SetActive(false);
-
-        //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     //オンラインプレイヤーの生成と初期化
@@ -205,8 +190,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
     IEnumerator AddPlayerArray()
     {
-        //2人揃うまで待つ
-        yield return new WaitUntil(() => GameObject.FindGameObjectsWithTag("Player").Length == 2);
+        //2人揃うまで待つ、デバッグモード
+        yield return new WaitUntil(() => GameObject.FindGameObjectsWithTag("Player").Length == 2 || isDebug == true);
         
         //プレイヤーを配列に入れる
         GameObject[] tempPlayerArray = GameObject.FindGameObjectsWithTag("Player");
@@ -233,7 +218,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     IEnumerator GameFinish()
     {
-        //2人揃うまで待つ
+        //ゲームフィニッシュフラグがたつ
         yield return new WaitUntil(() => isFinished == true);
         
         //勝ち負け判定

@@ -56,85 +56,81 @@ public class StageManager : MonoBehaviour
         
       } 
 
-
-      //周の数
-      ringsCount = (int)((StageManager.stageSizeX+1)/2);
-
-      
+        //周の数
+        ringsCount = (int)((StageManager.stageSizeX+1)/2);      
       }
 
-
-   
- //インスタンス化
-    if(instance == null)
-    {
-        instance = this;
-    }
-
+      //インスタンス化
+      if(instance == null)
+      {
+          instance = this;
+      }
     }
 
     // Update is called once per frame
     void Update()
     {
-      //ステージの端に入るとout of index になる
-      //塗り潰しが重い時と軽い時がある
-
       //プレイヤーの人数行う GameManager.instance.players.Length
       for(int p=0; p<2; p++){
+        SrroundAndFill(p);
+      }      
+    }
 
-        //ステージ走査値を初期値にする
-        for(int i=0; i<stageObjectFromEdge.Count; i++){          
-            stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[p]=1-(2*p); //                                                  
-        }  
-        
-        //外側から順番に処理
-        for(int i=0; i<stageObjectFromEdge.Count; i++){
-          if(stageObjectFromEdge[i].GetComponent<Stage>().isEdge == true){
-            fillColor(stageObjectFromEdge[i], 1-(2*p), p);
-          }
-          
-        } 
-
-        //既に塗られているところの走査値を0にする//今のところなくてもいいがこの操作によって新規で囲まれた部分だけをぬれる
-        for(int i=0; i<stageObjectFromEdge.Count; i++){    
-          if(stageObjectFromEdge[i].GetComponent<Stage>().stagePowerValue == 1-(2*p)){      
-            stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[p] = 0; //                                                  
-          }  
-        }
-
-        //プレイヤーのいるマスの走査値を0にする
-        GameObject[] tempPlayerList = GameObject.FindGameObjectsWithTag("Player");
-        for(int i=0; i<tempPlayerList.Length; i++){
-          // 現在の位置から下(0,-1,0)に向かってRayをセット
-          Ray ray = new Ray(tempPlayerList[i].transform.position + new Vector3(0,0.1f,0),Vector3.down);
-          // Rayが当たった相手を保存する変数
-          RaycastHit hit;
-          // Rayを10.0fの距離まで発射。何かに当たればhitで受け取る
-          if(Physics.Raycast(ray, out hit, 10.0f)) {
-            // もし当たった相手のタグがstageなら下の足場の色を変える
-            if(hit.collider.tag == "stage") {
-              hit.collider.gameObject.GetComponent<Stage>().stageScanFlag[p] = 0;
-            }
-          }
-        }
-
-        //塗り潰す
-        for(int i=0; i<stageObjectFromEdge.Count; i++){
-
-            if(stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[p] == 1-(2*p)){ //走査値が初期値のままだったら             
-                stageObjectFromEdge[i].GetComponent<Stage>().stagePowerValue = 1-(2*p);
-            }
-
-          
-        }
-        
-      }
-      
+    //リセットボタンから呼び出し
+    public void ResetAllPowerValue()
+    {
+      for(int i=0; i<stageObjectFromEdge.Count; i++){        
+        stageObjectFromEdge[i].GetComponent<Stage>().stagePowerValue = 0;
+      } 
     }
 
 
+
+//関数
+
+    //まとめた
+    public void SrroundAndFill(int p)
+    {
+      //ステージ走査値を初期値にする
+      ResetStageScanValue(p);  
+        
+      //外側から順番に処理
+      for(int i=0; i<stageObjectFromEdge.Count; i++){
+        if(stageObjectFromEdge[i].GetComponent<Stage>().isEdge == true){
+          //走査値を設定する
+          FillColorScan(stageObjectFromEdge[i], 1-(2*p), p);
+        }
+      } 
+
+      //既に塗られているところの走査値を0にする//今のところなくてもいいがこの操作によって新規で囲まれた部分だけをぬれるための案
+      RemoveScanDeplication(p);
+
+      //プレイヤーのいるマスの走査値を0にする
+      ResetOnPlayerHexa(p);
+
+      //塗り潰す
+      SetScanToPowerValue(p);
+
+    }
+    public void ResetStageScanValue(int p)
+    {
+      //ステージ走査値を初期値にする
+        for(int i=0; i<stageObjectFromEdge.Count; i++){          
+            stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[p]=1-(2*p); //                                                  
+        }  
+    }
+
+    public void RemoveScanDeplication(int p)
+    {
+      for(int i=0; i<stageObjectFromEdge.Count; i++){    
+        if(stageObjectFromEdge[i].GetComponent<Stage>().stagePowerValue == 1-(2*p)){      
+          stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[p] = 0;                                               
+        }  
+      }
+    }
+
     //囲んで塗る
-    public void fillColor(GameObject stageHexa, int stagePowerValue_, int stageScanFlagIndex){
+    public void FillColorScan(GameObject stageHexa, int stagePowerValue_, int stageScanFlagIndex){
 
 
       GameObject currentScanStage = stageHexa;
@@ -248,7 +244,37 @@ public class StageManager : MonoBehaviour
         }
       }
     }
-      //フィル関数終わり
+    //フィル関数終わり
+
+    //プレイヤーがいるマスの走査値を0に戻す
+    public void ResetOnPlayerHexa(int p)
+    {
+      GameObject[] tempPlayerList = GameObject.FindGameObjectsWithTag("Player");
+
+        for(int i=0; i<tempPlayerList.Length; i++){
+          // 現在の位置から下(0,-1,0)に向かってRayをセット
+          Ray ray = new Ray(tempPlayerList[i].transform.position + new Vector3(0,0.1f,0),Vector3.down);
+          // Rayが当たった相手を保存する変数
+          RaycastHit hit;
+          // Rayを10.0fの距離まで発射。何かに当たればhitで受け取る
+          if(Physics.Raycast(ray, out hit, 10.0f)) {
+            // もし当たった相手のタグがstageなら下の足場の色を変える
+            if(hit.collider.tag == "stage") {
+              hit.collider.gameObject.GetComponent<Stage>().stageScanFlag[p] = 0;
+            }
+          }
+        }
+    }
+
+    //スキャン値からパワー値を設定
+    public void SetScanToPowerValue(int p)
+    {
+      for(int i=0; i<stageObjectFromEdge.Count; i++){
+        if(stageObjectFromEdge[i].GetComponent<Stage>().stageScanFlag[p] == 1-(2*p)){ //走査値が初期値のままだったら             
+          stageObjectFromEdge[i].GetComponent<Stage>().stagePowerValue = 1-(2*p);
+        }         
+      }
+    }
 }
 
 
