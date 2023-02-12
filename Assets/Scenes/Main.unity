@@ -508,7 +508,7 @@ MonoBehaviour:
   totalPowerCount: 0
   isFinished: 0
   isPlaying: 0
-  isDebug: 1
+  isDebug: 0
 --- !u!114 &505283508
 MonoBehaviour:
   m_ObjectHideFlags: 0

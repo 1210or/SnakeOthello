@@ -15,16 +15,30 @@ public class GameManager : MonoBehaviourPunCallbacks
     [SerializeField, Range(0, 100)]
     public float totalTime = 60;
     int seconds;
+
+
+    [SerializeField, Range(1, 100)]//スライダ
+    public static int stageSizeX = 10; //x方向のステージの大きさ
+    public static int stageSizeZ = 10; //z方向のステージの大きさ
+    public float[,] stagePosition = new float[stageSizeX,stageSizeZ]; //座標のための配列、ステージの大きさを決めて配列のサイズにする
+
+    [SerializeField]
+    public GameObject[,] stageObject = new GameObject[stageSizeX,stageSizeZ];//ゲームオブジェクトが入っている配列
+  
+    //ステージのx方向の大きさはcos30の2倍
+    public  static float hexSizeX = MathF.Cos(MathF.PI/6);
+    public  static float hexSizeZ = 0.75f;
     
+    //ステージの周の数
+    public int ringsCount;
+
     //UI
     public GameObject finishText;
     public GameObject nextButton;
     public GameObject messageText;
     public GameObject createRoomPanel;
     public Text enterRoomName;
-
     public GameObject resetPowerValueButton;
-    
     
 
     //プレイヤー作成のための変数
@@ -34,14 +48,34 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     //スコアのための変数
     public int totalPowerCount = 0;
+ 
+    public bool isFinished = false;
+    public bool isPlaying = false;
+    public bool isDebug = true;
 
     public static GameManager instance;
 
-
-
     // Start is called before the first frame update
     void Awake()
-    {          
+    {//ステージ生成
+        if (PhotonNetwork.IsMasterClient)
+        {//プレファブを並べる 
+            for(int z=0;z<stageSizeZ;z++) //zの大きさぶんループ
+            {
+                for(int x=0;x<stageSizeX;x++)//xの大きさぶんループ
+                {      
+                    // "RoomObject"プレハブからルームオブジェクトを生成する
+                    GameObject tempPhotonStageObject = PhotonNetwork.InstantiateRoomObject("stageHexa", new Vector3(hexSizeX *  x + z * 0.5f * hexSizeX, 0, z * hexSizeZ ) , new Quaternion(1,0,0,-1));
+                    //インデックス情報を付与
+                    tempPhotonStageObject.GetComponent<Stage>().stageIndexX = x;
+                    tempPhotonStageObject.GetComponent<Stage>().stageIndexZ = z;          
+                }       
+            } 
+        }
+      
+        //周の数
+        ringsCount = (int)((stageSizeX+1)/2);           
+
         //インスタンス生成
         if (instance == null)
         {
@@ -49,22 +83,16 @@ public class GameManager : MonoBehaviourPunCallbacks
         }   
     }
 
-    void Start() {                                 
-        
-        //3秒後に開始
+    void Start()
+    {                          
+        //1秒後に開始
         StartCoroutine(JustBeforeGameStart());
-        
-        //if(isDebug==true)
-        //resetPowerValueButton.SetActive(true);
 
         //ゲーム終了動作
         //コルーチン、isFinished==trueまで
         StartCoroutine(GameFinish());
     }
-    
-    public bool isFinished = false;
-    public bool isPlaying = false;
-    public bool isDebug = true;
+
     
     // Update is called once per frame
     void Update()
@@ -97,7 +125,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     IEnumerator JustBeforeGameStart()
     {  
         //本当は配列の中にnullがなくなるまでのコルーチンを作りたかったが二重配列の中を調べるのが複雑だった。
-        yield return new WaitForSeconds (3.0f);
+        yield return new WaitUntil(() => stageObject[GameManager.stageSizeX - 1, GameManager.stageSizeZ - 1] != null);
 
         //ステージを回転させてカメラをステージの中心に移動させる
         SetStageAndCamera();
@@ -122,7 +150,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     void GenarateOnlinePlayer(int i)
     {                        
             //初期位置を決める
-            Vector3 firstPosition = StageManager.instance.stageObject[i * (StageManager.stageSizeX - 1),i * (StageManager.stageSizeZ - 1)].transform.position;
+            Vector3 firstPosition = GameManager.instance.stageObject[i * (GameManager.stageSizeX - 1),i * (GameManager.stageSizeZ - 1)].transform.position;
             
             //プレイヤーの人スタンスを生成
             GameObject player = PhotonNetwork.Instantiate("Player", firstPosition + new Vector3(0, 2, 0) , new Quaternion(1,0,0,180)); 
@@ -149,8 +177,11 @@ public class GameManager : MonoBehaviourPunCallbacks
         //ステージを回転させる
         GameObject.Find ("StageHexagons").transform.rotation = Quaternion.Euler(0, 30, 0);
         
+        GameObject stageL = GameManager.instance.stageObject[0,0];
+        GameObject stageR = GameManager.instance.stageObject[(GameManager.stageSizeX-1),(GameManager.stageSizeZ-1)];
+
         //ステージの中心を探す
-        Vector3 stageCenter = (StageManager.instance.stageObject[0,0].transform.position + StageManager.instance.stageObject[(StageManager.stageSizeX-1),(StageManager.stageSizeZ-1)].transform.position)/2;
+        Vector3 stageCenter = ((stageL.transform.position + stageR.transform.position)/2);
       
         //ステージのサイズに合わせてカメラを動かす
         GameObject.Find ("camCenter").transform.position = stageCenter + new Vector3(0, 0, 1.8f);
@@ -158,35 +189,36 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     void CalcDistanceFromEdge()
     {
-        for(int r=0; r<StageManager.instance.ringsCount; r++){
+        for(int r=0; r<GameManager.instance.ringsCount; r++){
 
-            for(int z=0; z<StageManager.stageSizeZ-(2*r); z++) //zの大きさぶんループ
+            for(int z=0; z<GameManager.stageSizeZ-(2*r); z++) //zの大きさぶんループ
             {
-            StageManager.instance.stageObject[r, r+z].GetComponent<Stage>().distanceFromEdge = r;
-            StageManager.instance.stageObject[StageManager.stageSizeZ-r-1, r+z].GetComponent<Stage>().distanceFromEdge = r;
+                GameManager.instance.stageObject[r, r+z].GetComponent<Stage>().distanceFromEdge = r;                
+                GameManager.instance.stageObject[GameManager.stageSizeZ-r-1, r+z].GetComponent<Stage>().distanceFromEdge = r;
 
-                for(int x=0; x<StageManager.stageSizeX-(2*r); x++)//xの大きさぶんループ
+                for(int x=0; x<GameManager.stageSizeX-(2*r); x++)//xの大きさぶんループ
                 {
                     //ステージの距離を格納
-                    StageManager.instance.stageObject[r+x, r].GetComponent<Stage>().distanceFromEdge = r;
-                    StageManager.instance.stageObject[r+x, StageManager.stageSizeX-r-1].GetComponent<Stage>().distanceFromEdge = r;
+                    GameManager.instance.stageObject[r+x, r].GetComponent<Stage>().distanceFromEdge = r;
+                    GameManager.instance.stageObject[r+x, GameManager.stageSizeX-r-1].GetComponent<Stage>().distanceFromEdge = r;
                 }
             }
         }
     }
     void AddStageListFromEdge()
     {
-        for(int r=0; r<StageManager.instance.ringsCount; r++){
-        for(int z=0;z<StageManager.stageSizeZ;z++) //zの大きさぶんループ
-        {
-          for(int x=0;x<StageManager.stageSizeX;x++)//xの大きさぶんループ
-          {
-            if(StageManager.instance.stageObject[x,z].GetComponent<Stage>().distanceFromEdge == r){
-              StageManager.instance.stageObjectFromEdge.Add(StageManager.instance.stageObject[x,z]);
+        for(int r=0; r<GameManager.instance.ringsCount; r++){
+            for(int z=0;z<GameManager.stageSizeZ;z++) //zの大きさぶんループ
+            {
+                for(int x=0;x<GameManager.stageSizeX;x++)//xの大きさぶんループ
+                {
+                    if(GameManager.instance.stageObject[x,z].GetComponent<Stage>().distanceFromEdge == r){                        
+                        StageManager.instance.stageObjectFromEdge.Add(GameManager.instance.stageObject[x,z]);
+                    }
+                }
             }
-          }
         }
-      }
+        
     }
     IEnumerator AddPlayerArray()
     {
@@ -225,20 +257,20 @@ public class GameManager : MonoBehaviourPunCallbacks
         int player1Sum = 0;
         int player2Sum = 0;
         
-        for(int z=0;z<StageManager.instance.stageObject.GetLength(0);z++) //zの大きさぶんループ
+        for(int z=0;z<GameManager.instance.stageObject.GetLength(0);z++) //zの大きさぶんループ
         {
-            for(int x=0;x<StageManager.instance.stageObject.GetLength(1);x++)//xの大きさぶんループ
+            for(int x=0;x<GameManager.instance.stageObject.GetLength(1);x++)//xの大きさぶんループ
             {
                 //スコアカウント
-                if(StageManager.instance.stageObject[x,z].GetComponent<Stage>().stagePowerValue > 0){
-                    player1Sum += StageManager.instance.stageObject[x,z].GetComponent<Stage>().stagePowerValue;
+                if(GameManager.instance.stageObject[x,z].GetComponent<Stage>().stagePowerValue > 0){
+                    player1Sum += GameManager.instance.stageObject[x,z].GetComponent<Stage>().stagePowerValue;
                 }
-                if(StageManager.instance.stageObject[x,z].GetComponent<Stage>().stagePowerValue < 0){
-                    player2Sum -= StageManager.instance.stageObject[x,z].GetComponent<Stage>().stagePowerValue;
+                if(GameManager.instance.stageObject[x,z].GetComponent<Stage>().stagePowerValue < 0){
+                    player2Sum -= GameManager.instance.stageObject[x,z].GetComponent<Stage>().stagePowerValue;
                 }
 
                 //勝ち負け判定
-                totalPowerCount += StageManager.instance.stageObject[x,z].GetComponent<Stage>().stagePowerValue;
+                totalPowerCount += GameManager.instance.stageObject[x,z].GetComponent<Stage>().stagePowerValue;
             }
         }
 

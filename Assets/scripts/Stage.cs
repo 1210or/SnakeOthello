@@ -9,8 +9,8 @@ public class Stage : MonoBehaviourPunCallbacks, IPunObservable
 //マスの形状
 public GameObject hexagon;
 
-public int stageIndexX = 0;
-public int stageIndexZ = 0;
+public int stageIndexX=-1;
+public int stageIndexZ=-1;
 
 public bool isEdge =false;
 public int distanceFromEdge = 0;
@@ -30,23 +30,24 @@ public int[] stageScanFlag = new int[]{1,-1};
     {        
       int x = this.GetComponent<Stage>().stageIndexX;
       int z = this.GetComponent<Stage>().stageIndexZ;
+      
       //オブジェクトの名前変更
       this.name = "hexagon" + x + "_" + z;
 
       //親設定
       this.transform.parent = GameObject.Find ("StageHexagons").transform;
-
-      //配列に入れる
-      StageManager.instance.stageObject[x, z] = this.gameObject;
-
       
       //ステージの端を定義
-      if(x == 0 || z == 0 || x == StageManager.stageSizeX - 1 || z == StageManager.stageSizeZ -1)
+      if(x == 0 || z == 0 || x == GameManager.stageSizeX - 1 || z == GameManager.stageSizeZ -1)
       {
         this.GetComponent<Stage>().isEdge = true;            
       }
 
       this.GetComponent<Renderer>().material.color = defaultStageColor;
+
+      //配列に入るコルーチン
+      StartCoroutine(EnterStageObjectArray());
+
     }
 
     // Update is called once per frame
@@ -66,18 +67,18 @@ public int[] stageScanFlag = new int[]{1,-1};
       //引数に入れたゲームオブジェクト(ステージ)の接するステージを配列にして返す
     public static List<GameObject> arroundHexagons (GameObject hexagon, int x, int z)
     {
-            //リストに周囲のステージを格納
-            List<GameObject> arroundHexagons = new List<GameObject>();
-            
-            //左下から反時計回り
-            try{arroundHexagons.Add(StageManager.instance.stageObject[x,z-1]);}catch (System.Exception){/*何もしない*/} //左下
-            try{arroundHexagons.Add(StageManager.instance.stageObject[x+1,z-1]);}catch (System.Exception){/*何もしない*/} //下
-            try{arroundHexagons.Add(StageManager.instance.stageObject[x+1,z]);}catch (System.Exception){/*何もしない*/} //右下
-            try{arroundHexagons.Add(StageManager.instance.stageObject[x,z+1]);}catch (System.Exception){/*何もしない*/} //右上
-            try{arroundHexagons.Add(StageManager.instance.stageObject[x-1,z+1]);}catch (System.Exception){/*何もしない*/} //上
-            try{arroundHexagons.Add(StageManager.instance.stageObject[x-1,z]);}catch (System.Exception){/*何もしない*/} //左上
-
-          return arroundHexagons;
+      //リストに周囲のステージを格納
+      List<GameObject> arroundHexagons = new List<GameObject>();      
+      
+      //左下から反時計回り
+      try{arroundHexagons.Add(GameManager.instance.stageObject[x,z-1]   );}  catch (System.Exception){/*何もしない*/} //左下
+      try{arroundHexagons.Add(GameManager.instance.stageObject[x+1,z-1] );}  catch (System.Exception){/*何もしない*/} //下
+      try{arroundHexagons.Add(GameManager.instance.stageObject[x+1,z]   );}  catch (System.Exception){/*何もしない*/} //右下
+      try{arroundHexagons.Add(GameManager.instance.stageObject[x,z+1]   );}  catch (System.Exception){/*何もしない*/} //右上
+      try{arroundHexagons.Add(GameManager.instance.stageObject[x-1,z+1] );}  catch (System.Exception){/*何もしない*/} //上
+      try{arroundHexagons.Add(GameManager.instance.stageObject[x-1,z]   );}  catch (System.Exception){/*何もしない*/} //左上
+      
+      return arroundHexagons;
     }
 
     
@@ -93,6 +94,17 @@ public int[] stageScanFlag = new int[]{1,-1};
         arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().stagePowerValue = stagePowerValue;
         arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Renderer>().material.color = color;
       }
+    }
+    IEnumerator EnterStageObjectArray()
+    {  
+      //ゲームマネージャーでマスターでインデックス付与されたあとphotonViewで同期されるのでそれ待ち
+      yield return new WaitForSeconds (1.0f);
+      //yield return new WaitUntil(() => this.GetComponent<Stage>().stageIndexX != -1); //なぜかこれだとダメ
+      
+      int x = this.GetComponent<Stage>().stageIndexX;
+      int z = this.GetComponent<Stage>().stageIndexZ;
+
+      GameManager.instance.stageObject[x, z] = this.gameObject;
     }
 
 //名前空間、継承、コンポーネントアタッチ必須
