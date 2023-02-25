@@ -121,6 +121,8 @@ MonoBehaviour:
   defaultStageColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
   stagePowerValue: 0
   stageScanFlag: 01000000ffffffff
+  isScaned: 0000
+  arroundHexagons: []
 --- !u!114 &-1692420760290101528
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -34,7 +34,7 @@ public class StageManager : MonoBehaviour
     {//プレイヤーの人数行う GameManager.instance.players.Length
       for(int p=0; p<2; p++)
       {//囲み塗り
-        SrroundAndFill(p);
+        //SrroundAndFill(p);
       } 
     }         
   }
@@ -54,7 +54,8 @@ public class StageManager : MonoBehaviour
 
     //塗り潰し
     public void SrroundAndFill(int p)
-    {//ステージ走査値を初期値にする
+    { 
+    //ステージ走査値を初期値にする
       ResetStageScanValue(p);  
         
       //外周のみ処理
@@ -72,8 +73,6 @@ public class StageManager : MonoBehaviour
       //塗り潰す
       SetScanToPowerValue(p);
     }
-
-
 
     public void ResetStageScanValue(int p)
     {
@@ -124,10 +123,10 @@ public class StageManager : MonoBehaviour
           }else
           {//外側でないなら周囲に0があれば0にする
             //周囲6回
-            for(int i = 0; i < Stage.arroundHexagons(currentScanStage, currentScanStage.GetComponent<Stage>().stageIndexX, currentScanStage.GetComponent<Stage>().stageIndexZ).Count; i++ ){
+            for(int i = 0; i < Stage.ArroundHexagons(currentScanStage).Count; i++ ){
 
               //そのマスの走査値が0であれば
-              if(Stage.arroundHexagons(currentScanStage, currentScanStage.GetComponent<Stage>().stageIndexX, currentScanStage.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] == 0)
+              if(Stage.ArroundHexagons(currentScanStage)[i].GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] == 0)
               {//ステージ走査値を0にする
                 currentScanStage.GetComponent<Stage>().stageScanFlag[stageScanFlagIndex] = 0;
                 break; //なくてもいい、無駄な処理を繰り返さないため
@@ -136,13 +135,13 @@ public class StageManager : MonoBehaviour
           }
 
           //周囲6回
-          for(int i = 0; i < Stage.arroundHexagons(currentScanStage, currentScanStage.GetComponent<Stage>().stageIndexX, currentScanStage.GetComponent<Stage>().stageIndexZ).Count; i++ ){
+          for(int i = 0; i < Stage.ArroundHexagons(currentScanStage).Count; i++ ){
             //次のマスを探す作業
                 
             //周囲を調べるときに長いから変数に入れとく
-            GameObject tempAroundStage = Stage.arroundHexagons(currentScanStage, currentScanStage.GetComponent<Stage>().stageIndexX, currentScanStage.GetComponent<Stage>().stageIndexZ)[i];
-            int tempScanFlag = Stage.arroundHexagons(currentScanStage, currentScanStage.GetComponent<Stage>().stageIndexX, currentScanStage.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().stageScanFlag[stageScanFlagIndex];  
-            int tempPowerValue =Stage.arroundHexagons(currentScanStage, currentScanStage.GetComponent<Stage>().stageIndexX, currentScanStage.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().stagePowerValue;
+            GameObject tempAroundStage = Stage.ArroundHexagons(currentScanStage)[i];
+            int tempScanFlag = Stage.ArroundHexagons(currentScanStage)[i].GetComponent<Stage>().stageScanFlag[stageScanFlagIndex];  
+            int tempPowerValue =Stage.ArroundHexagons(currentScanStage)[i].GetComponent<Stage>().stagePowerValue;
                   
             //そのマスの走査値が1であり  //そのマスが自分の色じゃない場合
             if((tempScanFlag == stagePowerValue_)&&(tempPowerValue != stagePowerValue_)){            
@@ -158,7 +157,7 @@ public class StageManager : MonoBehaviour
               {//次のマスが見つかったらbreakしてるので入らない
                       
               //もし6個全部から進む先がなかったら
-              if(i == Stage.arroundHexagons(currentScanStage, currentScanStage.GetComponent<Stage>().stageIndexX, currentScanStage.GetComponent<Stage>().stageIndexZ).Count-1)
+              if(i == Stage.ArroundHexagons(currentScanStage).Count-1)
               {//リストが負の数にならないようにする
                   if((scanStageList.Count-2) >= 0)
                   {
@@ -204,7 +203,7 @@ public class StageManager : MonoBehaviour
             hit.collider.gameObject.GetComponent<Stage>().stageScanFlag[p] = 0;
           }
         }
-      }
+    }
     }
 
     //スキャン値からパワー値を設定

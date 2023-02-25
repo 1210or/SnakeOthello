@@ -140,6 +140,7 @@ MonoBehaviour:
   paintColor: {r: 0, g: 0, b: 0, a: 0}
   firstPosition: {x: 0, y: 0, z: 0}
   solverGameObject: {fileID: 0}
+  currentPlayerHexa: {fileID: 0}
   newHexaFlag: 0
   playerID: 0
 --- !u!114 &2029621694687559713

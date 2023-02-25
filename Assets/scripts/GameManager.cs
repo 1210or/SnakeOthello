@@ -7,6 +7,7 @@ using Photon.Realtime;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
+using System.Diagnostics; 
 
 
 public class GameManager : MonoBehaviourPunCallbacks
@@ -38,8 +39,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public GameObject messageText;
     public GameObject createRoomPanel;
     public Text enterRoomName;
-    public GameObject resetPowerValueButton;
-    
+    public GameObject resetPowerValueButton;    
 
     //プレイヤー作成のための変数
     public GameObject player;
@@ -52,6 +52,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public bool isFinished = false;
     public bool isPlaying = false;
     public bool isDebug = true;
+    public bool isStageArrayOK = false;
 
     public static GameManager instance;
 
@@ -84,15 +85,18 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
 
     void Start()
-    {                          
-        //1秒後に開始
+    {   
+        //配列のnullチェックコルーチンに入れてワンテンポ待たないとないと他のスクリプトのstartメソッドが走らない、
+        StartCoroutine(WaitNullCheck());
+               
+        //ステージの配列入るの待ち
         StartCoroutine(JustBeforeGameStart());
 
         //ゲーム終了動作
         //コルーチン、isFinished==trueまで
         StartCoroutine(GameFinish());
     }
-
+ 
     
     // Update is called once per frame
     void Update()
@@ -121,11 +125,53 @@ public class GameManager : MonoBehaviourPunCallbacks
             }            
         }
     }
+
+    //コルーチンで待つ
+    IEnumerator WaitTime(float seconds)
+    {
+        yield return new WaitForSeconds (seconds);
+    }
+
+    IEnumerator WaitNullCheck()
+    {
+        yield return new WaitForSeconds (1.1f); //EnterStageObjectArrayが1秒待ちなのでそれ以上
+        
+        var sw = new Stopwatch();
+        sw.Start();
+
+        while( sw.ElapsedMilliseconds < 100 && isStageArrayOK == false){ //無限ループ防止用
+            //ステージ配列nullcheck
+            isStageArrayOK = NullCheckStageArray();     
+            print(isStageArrayOK);       
+        }
+    }
+
+    //配列にnullがあるか調べる
+    public bool NullCheckStageArray()
+    {
+        bool tempNullCheck = true;
+
+        for(int x=0; x<stageSizeX; x++)
+        {
+            for(int z=0; z<stageSizeZ; z++)
+            {
+                if(stageObject[x,z]==null)
+                {
+                    //print("x: " + x + ", z: " + z);
+                    tempNullCheck = false;
+                    break;                    
+                }
+            }
+        }
+        
+        return tempNullCheck;
+    }
+    
        
     IEnumerator JustBeforeGameStart()
     {  
-        //本当は配列の中にnullがなくなるまでのコルーチンを作りたかったが二重配列の中を調べるのが複雑だった。
-        yield return new WaitUntil(() => stageObject[GameManager.stageSizeX - 1, GameManager.stageSizeZ - 1] != null);
+        //ステージアレイが全て格納されたら
+        yield return new WaitUntil(() => isStageArrayOK == true);
 
         //ステージを回転させてカメラをステージの中心に移動させる
         SetStageAndCamera();
@@ -140,6 +186,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         GenarateOnlinePlayer(PhotonNetwork.LocalPlayer.ActorNumber - 1);
             
         //コルーチン、ゲーム上にプレイヤータグがついた人が2人になったら配列に入れる。同期せずそれぞれで実行
+        //isPlayerフラグもこの中でオンになる
         StartCoroutine(AddPlayerArray());
   
         //ステージ回転させないと見栄えが悪いから隠す
@@ -228,16 +275,17 @@ public class GameManager : MonoBehaviourPunCallbacks
         //プレイヤーを配列に入れる
         GameObject[] tempPlayerArray = GameObject.FindGameObjectsWithTag("Player");
 
-        for(int j=0; j<tempPlayerArray.Length; j++)
-        {
-            if(tempPlayerArray[j].GetComponent<Player>().photonView.OwnerActorNr == 1)//タグ検索で取得したプレイヤーの配列の順番が正しいかを判定する
+
+            for(int j=0; j<tempPlayerArray.Length; j++)
             {
-                playerArray[0] =  tempPlayerArray[j];                
-            }else //正しくなければ順番を入れ替える
-            {
-                playerArray[1] =  tempPlayerArray[j];                
+                if(tempPlayerArray[j].GetComponent<Player>().photonView.OwnerActorNr == 1)//タグ検索で取得したプレイヤーの配列の順番が正しいかを判定する
+                {
+                    playerArray[0] =  tempPlayerArray[j];                
+                }else //正しくなければ順番を入れ替える
+                {
+                    playerArray[1] =  tempPlayerArray[j];                
+                }
             }
-        }
 
         for(int j=0; j<playerArray.Length; j++)
         {

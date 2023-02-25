@@ -3,26 +3,31 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using System.Linq;
+using System;
 
 public class Stage : MonoBehaviourPunCallbacks, IPunObservable
 {
-//マスの形状
-public GameObject hexagon;
+  //マスの形状
+  public GameObject hexagon;
 
-public int stageIndexX=-1;
-public int stageIndexZ=-1;
+  public int stageIndexX=-1;
+  public int stageIndexZ=-1;
 
-public bool isEdge =false;
-public int distanceFromEdge = 0;
+  public bool isEdge =false;
+  public int distanceFromEdge = 0;
 
-public bool isPlayerOn = false;
+  public bool isPlayerOn = false;
 
-public Color defaultStageColor = new Color(0.9f, 0.9f, 0.9f);
+  public Color defaultStageColor = new Color(0.9f, 0.9f, 0.9f);
 
-//どちら陣営か判定 +1はプレイヤー1、-1はプレイヤー2
-public int stagePowerValue = 0; 
+  //どちら陣営か判定 +1はプレイヤー1、-1はプレイヤー2
+  public int stagePowerValue = 0; 
 
-public int[] stageScanFlag = new int[]{1,-1};
+  public int[] stageScanFlag = new int[]{1,-1};
+  public bool[] isScaned = new bool[]{false,false};
+
+  public List<GameObject> arroundHexagons;
 
 
     // Start is called before the first frame update
@@ -47,6 +52,9 @@ public int[] stageScanFlag = new int[]{1,-1};
 
       //配列に入るコルーチン
       StartCoroutine(EnterStageObjectArray());
+      
+      //ステージメンバ変数に周囲のマスを格納(全てのマスが配列に入ったら実行)
+      StartCoroutine(SetArround());
 
     }
 
@@ -65,10 +73,13 @@ public int[] stageScanFlag = new int[]{1,-1};
     }
 
       //引数に入れたゲームオブジェクト(ステージ)の接するステージを配列にして返す
-    public static List<GameObject> arroundHexagons (GameObject hexagon, int x, int z)
+    public static List<GameObject> ArroundHexagons (GameObject hexagon)
     {
       //リストに周囲のステージを格納
-      List<GameObject> arroundHexagons = new List<GameObject>();      
+      List<GameObject> arroundHexagons = new List<GameObject>(); 
+
+      int x = hexagon.GetComponent<Stage>().stageIndexX;
+      int z = hexagon.GetComponent<Stage>().stageIndexZ;
       
       //左下から反時計回り
       try{arroundHexagons.Add(GameManager.instance.stageObject[x,z-1]   );}  catch (System.Exception){/*何もしない*/} //左下
@@ -81,6 +92,11 @@ public int[] stageScanFlag = new int[]{1,-1};
       return arroundHexagons;
     }
 
+    private void OnMouseDown() {
+      print("This is " + this.name);
+      this.arroundHexagons.ForEach(name => print("Around is : " + name));
+    }
+
     
     public void colorBomb(GameObject stageHexa, Color color, int stagePowerValue){
       //自分の色を変える
@@ -88,23 +104,32 @@ public int[] stageScanFlag = new int[]{1,-1};
       stageHexa.GetComponent<Renderer>().material.color = color;
       
       //周囲の色を変える
-      for(int i = 0; i < arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ).Count; i++ ){
+      for(int i = 0; i < ArroundHexagons(stageHexa.gameObject).Count; i++ ){
 
-        //arroundHexagons関数を使ってthis.gameObjectの隣接するヘキサゴンを取得
-        arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Stage>().stagePowerValue = stagePowerValue;
-        arroundHexagons(stageHexa.gameObject, stageHexa.GetComponent<Stage>().stageIndexX, stageHexa.GetComponent<Stage>().stageIndexZ)[i].GetComponent<Renderer>().material.color = color;
+        //ArroundHexagons関数を使ってthis.gameObjectの隣接するヘキサゴンを取得
+        ArroundHexagons(stageHexa.gameObject)[i].GetComponent<Stage>().stagePowerValue = stagePowerValue;
+        ArroundHexagons(stageHexa.gameObject)[i].GetComponent<Renderer>().material.color = color;
       }
     }
     IEnumerator EnterStageObjectArray()
     {  
       //ゲームマネージャーでマスターでインデックス付与されたあとphotonViewで同期されるのでそれ待ち
-      yield return new WaitForSeconds (1.0f);
+      yield return new WaitForSeconds (1.0f);//この1秒がWaitNullCheckに影響している
       //yield return new WaitUntil(() => this.GetComponent<Stage>().stageIndexX != -1); //なぜかこれだとダメ
       
       int x = this.GetComponent<Stage>().stageIndexX;
       int z = this.GetComponent<Stage>().stageIndexZ;
 
       GameManager.instance.stageObject[x, z] = this.gameObject;
+    }
+
+    IEnumerator SetArround()
+    {
+      //ステージアレイが全て格納されたら
+      yield return new WaitUntil(() => GameManager.instance.isStageArrayOK == true);
+
+      //周囲のマスを保持しておく
+      arroundHexagons = ArroundHexagons(this.gameObject);
     }
 
 //名前空間、継承、コンポーネントアタッチ必須

@@ -274,7 +274,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Reset
+  m_Text: Debug
 --- !u!222 &43293704
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -465,7 +465,6 @@ MonoBehaviour:
   hexagon: {fileID: 5573011843609136651, guid: 3bf4740baedac4bc088ab3a4d87f5af7, type: 3}
   cam: {fileID: 455662232}
   stageParent: {fileID: 2069994791}
-  ringsCount: 0
   stageObjectFromEdge: []
 --- !u!4 &505283506
 Transform:
@@ -495,6 +494,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   totalTime: 30
+  ringsCount: 0
   finishText: {fileID: 1181773818}
   nextButton: {fileID: 757782502}
   messageText: {fileID: 1810246489}
@@ -509,6 +509,7 @@ MonoBehaviour:
   isFinished: 0
   isPlaying: 0
   isDebug: 0
+  isStageArrayOK: 0
 --- !u!114 &505283508
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1350,8 +1351,9 @@ GameObject:
   - component: {fileID: 2068195082}
   - component: {fileID: 2068195081}
   - component: {fileID: 2068195080}
+  - component: {fileID: 2068195083}
   m_Layer: 5
-  m_Name: ResetAllPowerValue
+  m_Name: DebugButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1421,19 +1423,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2068195081}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 505283505}
-        m_TargetAssemblyTypeName: StageManager, Assembly-CSharp
-        m_MethodName: ResetAllPowerValue
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &2068195081
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1472,6 +1462,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2068195078}
   m_CullTransparentMesh: 1
+--- !u!114 &2068195083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2068195078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83b80d00069ae4ba59f7bb077324dc69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2069994791
 GameObject:
   m_ObjectHideFlags: 0
