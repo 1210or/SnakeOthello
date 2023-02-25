@@ -19,8 +19,8 @@ public class GameManager : MonoBehaviourPunCallbacks
 
 
     [SerializeField, Range(1, 100)]//スライダ
-    public static int stageSizeX = 10; //x方向のステージの大きさ
-    public static int stageSizeZ = 10; //z方向のステージの大きさ
+    public static int stageSizeX = 15; //x方向のステージの大きさ
+    public static int stageSizeZ = 15; //z方向のステージの大きさ
     public float[,] stagePosition = new float[stageSizeX,stageSizeZ]; //座標のための配列、ステージの大きさを決めて配列のサイズにする
 
     [SerializeField]
@@ -231,7 +231,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         Vector3 stageCenter = ((stageL.transform.position + stageR.transform.position)/2);
       
         //ステージのサイズに合わせてカメラを動かす
-        GameObject.Find ("camCenter").transform.position = stageCenter + new Vector3(0, 0, 1.8f);
+        GameObject.Find ("camCenter").transform.position = stageCenter;        
     }
 
     void CalcDistanceFromEdge()

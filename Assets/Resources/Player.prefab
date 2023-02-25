@@ -40,7 +40,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1339817059557221365}
-  - component: {fileID: -8433747515720830631}
   - component: {fileID: 1339817059557221364}
   - component: {fileID: 4747537304491998765}
   - component: {fileID: 1339817059557221367}
@@ -70,18 +69,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-8433747515720830631
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1339817059557221371}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6c4b8e6a53f44f21bad5a914cc173af, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!54 &1339817059557221364
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -142,6 +129,9 @@ MonoBehaviour:
   solverGameObject: {fileID: 0}
   currentPlayerHexa: {fileID: 0}
   newHexaFlag: 0
+  playerCamera: {fileID: 0}
+  walkSpeed: 3
+  speedBuff: 1
   playerID: 0
 --- !u!114 &2029621694687559713
 MonoBehaviour:

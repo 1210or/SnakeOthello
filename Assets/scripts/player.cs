@@ -33,6 +33,12 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
     public bool newHexaFlag = false;
 
     public static Player instance;
+
+    public GameObject playerCamera;
+
+    public float walkSpeed = 3;
+    public float speedBuff = 1; //今のところ未使用
+
     void Awake()
     {
         if (instance == null)
@@ -48,28 +54,20 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         playerID = PhotonNetwork.LocalPlayer.ActorNumber - 1;
          
         this.transform.Find("player").gameObject.GetComponent<Renderer>().material.color = playerColor;//プレイヤーの子供オブジェクトの色を変える
-
-        StartCoroutine(ButtonAddListener());
-    }
-
-        //インスペクタ状には出てこない
-    IEnumerator ButtonAddListener()
-    {       
-        yield return new WaitForSeconds(1);
-
-        //インスペクタ状には出てこない
-        Button button = GameObject.Find("DebugButton").GetComponent<Button>(); //buttonコンポーネントを取得
-        GameObject temp = this.gameObject;
-        button.onClick.AddListener(temp.GetComponent<Player>().OnClickDebugButton);
+        
+        if(photonView.IsMine)
+        {
+            playerCamera = GameObject.Find ("MainCamera");
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        MoveControler();
+
         //自分の下のマスのステージパワー値を変更、現在自分がいるマスも取得→currentPlayerHexa
-        CheckMyFeet();
-        
+        CheckMyFeet();        
         
         //現在のマスの周囲をforeach
         foreach(var currentAround in currentPlayerHexa.GetComponent<Stage>().arroundHexagons)
@@ -79,6 +77,52 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         
         //ステージから落ちた時の処理
         DropPlayer(-2); //引数はy座標、それ以下になったら落ちた判定
+    }
+
+    public void MoveControler()
+    {
+        if(photonView.IsMine){
+            //x軸方向の入力を保存
+            Vector3 inputKey;  
+            
+            // WASD入力から、XZ平面(水平な地面)を移動する方向(velocity)を得ます
+            inputKey = Vector3.zero;
+            
+            if(Input.GetKey(KeyCode.W))
+                inputKey.z += 1;
+            if(Input.GetKey(KeyCode.A))
+                inputKey.x -= 1;
+            if(Input.GetKey(KeyCode.S))
+                inputKey.z -= 1;
+            if(Input.GetKey(KeyCode.D))
+                inputKey.x += 1;
+
+            //移動の向きなど座標関連はVector3で扱う
+            Vector3 velocity = new Vector3(inputKey.x, 0, inputKey.z).normalized;
+
+            //45度を30度に変換
+            float convertRot = ((1-Mathf.Tan(Mathf.PI/6))/2) * (Mathf.Cos(4 * (Mathf.Atan2(velocity.z, velocity.x)))+1) + Mathf.Tan(Mathf.PI/6);
+
+            //ベクトルの向きを取得 //zに角度変換をかける
+            Vector3 direction = new Vector3(inputKey.x, 0, inputKey.z * convertRot).normalized;
+           
+            //移動距離を計算
+            float distance = walkSpeed * Time.deltaTime * speedBuff;
+            //移動先を計算
+            Vector3 destination = transform.position + direction * distance;
+            
+            //移動先に向けて回転
+            transform.LookAt(destination);
+            
+            //プレイ中なら  移動先の座標を設定
+            if(GameManager.instance.isPlaying == true || GameManager.instance.isDebug == true){
+                transform.position = destination;
+            }
+
+            //カメラ移動
+            playerCamera.transform.position = new Vector3(destination.x, 0, destination.z);
+            
+        }  
     }
 
     public void OnClickDebugButton()
@@ -273,7 +317,8 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
                 if(PhotonNetwork.PlayerList.Length == 2 || GameManager.instance.isDebug == true)//プレイヤーが2人ならステージパワー値を変更
                 {
                     if(hit.collider.gameObject.GetComponent<Stage>().stagePowerValue != playerPowerValue)//もし足元のステージのパワー値と自分のチームパワー値が違うならば
-                    {                    
+                    {     
+              
                         hit.collider.gameObject.GetComponent<Stage>().stagePowerValue = playerPowerValue;//ステージパワーを変える
                     }
                 }   
