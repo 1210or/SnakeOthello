@@ -12,9 +12,10 @@ using System.Diagnostics;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
-    //タイマーのための変数
-    [SerializeField, Range(0, 100)]
-    public float totalTime = 60;
+    public bool isDebug = true;
+
+    //タイマーのための変数    
+    private float totalTime = 120;
     int seconds;
 
 
@@ -51,7 +52,6 @@ public class GameManager : MonoBehaviourPunCallbacks
  
     public bool isFinished = false;
     public bool isPlaying = false;
-    public bool isDebug = true;
     public bool isStageArrayOK = false;
 
     public static GameManager instance;
@@ -157,7 +157,6 @@ public class GameManager : MonoBehaviourPunCallbacks
             {
                 if(stageObject[x,z]==null)
                 {
-                    //print("x: " + x + ", z: " + z);
                     tempNullCheck = false;
                     break;                    
                 }

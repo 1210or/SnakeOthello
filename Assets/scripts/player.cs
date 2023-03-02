@@ -38,6 +38,7 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
 
     public float walkSpeed = 3;
     public float speedBuff = 1; //今のところ未使用
+    private float constSpeedBuff = 2;
 
     void Awake()
     {
@@ -48,13 +49,16 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     public int playerID;
+    public int enemyPlayerID;
     // Start is called before the first frame update
     void Start()
     {
         playerID = PhotonNetwork.LocalPlayer.ActorNumber - 1;
-         
-        this.transform.Find("player").gameObject.GetComponent<Renderer>().material.color = playerColor;//プレイヤーの子供オブジェクトの色を変える
-        
+        enemyPlayerID = 1 - PhotonNetwork.LocalPlayer.ActorNumber;
+
+        StartCoroutine(WaitIsStart());
+
+
         if(photonView.IsMine)
         {
             playerCamera = GameObject.Find ("MainCamera");
@@ -82,6 +86,15 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
     public void MoveControler()
     {
         if(photonView.IsMine){
+            
+            int numOfArroundPlayerColor = CountArroundColor(currentPlayerHexa, playerPowerValue);
+            if(numOfArroundPlayerColor == 6)
+            {
+                speedBuff = constSpeedBuff;
+            }else
+            {
+                speedBuff = 1;
+            }
             //x軸方向の入力を保存
             Vector3 inputKey;  
             
@@ -115,14 +128,23 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
             transform.LookAt(destination);
             
             //プレイ中なら  移動先の座標を設定
-            if(GameManager.instance.isPlaying == true || GameManager.instance.isDebug == true){
+            if(GameManager.instance.isPlaying == true || GameManager.instance.isDebug == true)
+            {
                 transform.position = destination;
-            }
-
-            //カメラ移動
-            playerCamera.transform.position = new Vector3(destination.x, 0, destination.z);
-            
+                
+                //カメラ移動
+                playerCamera.transform.position = new Vector3(destination.x, 0, destination.z);
+            }                        
         }  
+    }
+
+    IEnumerator WaitIsStart()
+    {
+        yield return new WaitUntil(() => GameManager.instance.isPlaying == true || GameManager.instance.isDebug == true);
+
+        this.transform.Find("player").gameObject.GetComponent<Renderer>().material.color = playerColor;//プレイヤーの子供オブジェクトの色を変える
+        this.transform.Find("MiniMapIcon_inside").gameObject.GetComponent<Renderer>().material.color = teamColor;//プレイヤーの子供オブジェクトの色を変える
+        this.transform.Find("MiniMapIcon_outside").gameObject.GetComponent<Renderer>().material.color = new Color(1, 1, 1);//プレイヤーの子供オブジェクトの色を変える
     }
 
     public void OnClickDebugButton()
@@ -157,9 +179,20 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         scanStageList.Add(stageHexa);
         fillStageList.Add(stageHexa);
 
+        bool isScanStart = false;
+
+        int numOfArroundPlayerColor = CountArroundColor(this.currentPlayerHexa, this.playerPowerValue);
+        int numOfArroundEnemyColor = CountArroundColor(this.currentPlayerHexa, (-1*this.playerPowerValue));
+
+        if((numOfArroundPlayerColor > 1 && numOfArroundPlayerColor < 5 && numOfArroundEnemyColor > 2 && numOfArroundEnemyColor < 4) || numOfArroundEnemyColor < 2)
+        {
+            isScanStart = true;
+        }
+        isScanStart = true;//まだ開発中なのでスタートの条件を決めない
+
         print("0");
         //開始するマスが赤じゃない&&走査前である(プレイヤーが赤の場合)
-        if(stageHexa.GetComponent<Stage>().stagePowerValue != playerStagePowerValue && stageHexa.GetComponent<Stage>().isScaned[playerID] == false)
+        if(isScanStart == true && stageHexa.GetComponent<Stage>().stagePowerValue != playerStagePowerValue && stageHexa.GetComponent<Stage>().isScaned[playerID] == false)
         { 
             print("1");
             // new によりStopwatch のインスタンスを生成する方法
@@ -301,6 +334,31 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
           StageManager.instance.stageObjectFromEdge[i].GetComponent<Stage>().isScaned[playerID] = false;                                                  
         }  
     }
+
+    //周囲のマスの色を数える
+    private int CountArroundColor(GameObject stageHexa, int playerPowerValue)
+    {
+        int numOfArroundColor = 0;
+
+        if(stageHexa == null)
+        {
+            return -1;
+        }
+
+        for (int i = 0; i < stageHexa.GetComponent<Stage>().arroundHexagons.Count; i++)
+        {
+            GameObject currentHexa = stageHexa.GetComponent<Stage>().arroundHexagons[i];
+            if(currentHexa.GetComponent<Stage>().stagePowerValue == playerPowerValue)
+            {
+                numOfArroundColor += 1;
+            }
+        }
+
+
+        return numOfArroundColor;
+    }
+
+
 
     //自分の下のマスのステージパワー値を変更、現在自分がいるマスも取得
     private void CheckMyFeet()

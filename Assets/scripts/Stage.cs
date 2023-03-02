@@ -27,6 +27,8 @@ public class Stage : MonoBehaviourPunCallbacks, IPunObservable
   public int[] stageScanFlag = new int[]{1,-1};
   public bool[] isScaned = new bool[]{false,false};
 
+  public float minimapAlpha = 0.8f;
+
   public List<GameObject> arroundHexagons;
 
 
@@ -65,9 +67,11 @@ public class Stage : MonoBehaviourPunCallbacks, IPunObservable
         if(this.stagePowerValue != 0){ 
           //ステージのパワー値が変わったら色を変更する
           this.GetComponent<Renderer>().material.color = GameManager.instance.playerArray[(int)(-0.5f*(this.stagePowerValue-1))].GetComponent<Player>().paintColor;
+          this.transform.Find("minimap_icon_inside").gameObject.GetComponent<Renderer>().material.color = GameManager.instance.playerArray[(int)(-0.5f * (this.stagePowerValue - 1))].GetComponent<Player>().teamColor - new Color(0, 0, 0, 1 - minimapAlpha);         
         }else
         {
-          this.GetComponent<Renderer>().material.color = defaultStageColor;
+          this.GetComponent<Renderer>().material.color = defaultStageColor; //デフォルトの状態
+                this.transform.Find("minimap_icon_inside").gameObject.GetComponent<Renderer>().material.color = defaultStageColor - new Color(0, 0, 0, 1 - minimapAlpha);
         }     
       }            
     }
