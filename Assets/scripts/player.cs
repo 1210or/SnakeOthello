@@ -78,6 +78,7 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         {
             ScanFrom(currentAround);
         }
+        //走査と塗りは分けるべき、すべて走査し終わった後に塗らないと条件が変わっちゃう
         
         //ステージから落ちた時の処理
         DropPlayer(-2); //引数はy座標、それ以下になったら落ちた判定
@@ -181,14 +182,16 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
 
         bool isScanStart = false;
 
-        int numOfArroundPlayerColor = CountArroundColor(this.currentPlayerHexa, this.playerPowerValue);
+        //走査を走らせる条件
         int numOfArroundEnemyColor = CountArroundColor(this.currentPlayerHexa, (-1*this.playerPowerValue));
+        int numOfArroundColorBlocks = CountArroundColorBlocks(this.currentPlayerHexa, (this.playerPowerValue));
 
-        if((numOfArroundPlayerColor > 1 && numOfArroundPlayerColor < 5 && numOfArroundEnemyColor > 2 && numOfArroundEnemyColor < 4) || numOfArroundEnemyColor < 2)
+        if (numOfArroundColorBlocks > 1 || numOfArroundEnemyColor == 0)
         {
             isScanStart = true;
         }
-        isScanStart = true;//まだ開発中なのでスタートの条件を決めない
+        //走査を走らせる条件
+
 
         print("0");
         //開始するマスが赤じゃない&&走査前である(プレイヤーが赤の場合)
@@ -357,6 +360,34 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
 
         return numOfArroundColor;
     }
+
+    private int CountArroundColorBlocks(GameObject stageHexa, int separatePowerValue)
+    {
+        int numOfArroundColorBlocks = 0;
+        for (int i = 0; i < stageHexa.GetComponent<Stage>().arroundHexagons.Count; i++)
+        {
+            GameObject currentHexa = stageHexa.GetComponent<Stage>().arroundHexagons[i];
+            GameObject lastHexa;
+
+            //周囲を走査で一つ前のマスを入れる
+            try
+            {
+                lastHexa = stageHexa.GetComponent<Stage>().arroundHexagons[i-1];
+            }catch 
+            { 
+                lastHexa = null;
+            }
+
+
+            if (currentHexa.GetComponent<Stage>().stagePowerValue != separatePowerValue && (lastHexa == null || lastHexa.GetComponent<Stage>().stagePowerValue == separatePowerValue))
+            {
+                numOfArroundColorBlocks += 1;
+            }
+        }
+        print(numOfArroundColorBlocks);
+        return numOfArroundColorBlocks;
+    }
+
 
 
 
