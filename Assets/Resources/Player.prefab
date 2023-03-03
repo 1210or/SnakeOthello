@@ -135,6 +135,7 @@ MonoBehaviour:
   speedBuff: 1
   playerID: 0
   enemyPlayerID: 0
+  fillStageList: []
 --- !u!114 &2029621694687559713
 MonoBehaviour:
   m_ObjectHideFlags: 0

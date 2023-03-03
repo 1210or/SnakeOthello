@@ -65,6 +65,7 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    public List<GameObject> fillStageList;
     // Update is called once per frame
     void Update()
     {
@@ -72,13 +73,8 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
 
         //自分の下のマスのステージパワー値を変更、現在自分がいるマスも取得→currentPlayerHexa
         CheckMyFeet();        
-        
-        //現在のマスの周囲をforeach
-        foreach(var currentAround in currentPlayerHexa.GetComponent<Stage>().arroundHexagons)
-        {
-            ScanFrom(currentAround);
-        }
-        //走査と塗りは分けるべき、すべて走査し終わった後に塗らないと条件が変わっちゃう
+
+        ScanAndFill();
         
         //ステージから落ちた時の処理
         DropPlayer(-2); //引数はy座標、それ以下になったら落ちた判定
@@ -148,16 +144,20 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         this.transform.Find("MiniMapIcon_outside").gameObject.GetComponent<Renderer>().material.color = new Color(1, 1, 1);//プレイヤーの子供オブジェクトの色を変える
     }
 
-    public void OnClickDebugButton()
+    public void ScanAndFill()
     {
-        print("Debug!!");
-        print(this.name + " CurrentHexa: " + currentPlayerHexa);
-        
+        fillStageList = new List<GameObject>();
+
         //現在のマスの周囲をforeach
-        foreach(var currentAround in this.currentPlayerHexa.GetComponent<Stage>().arroundHexagons)
+        foreach(var currentAround in currentPlayerHexa.GetComponent<Stage>().arroundHexagons)
         {
-            print("currentAround: " + currentAround.name);
             ScanFrom(currentAround);
+        }
+        //走査と塗りは分けるべき、すべて走査し終わった後に塗らないと条件が変わっちゃう
+
+        foreach (var content in fillStageList)
+        {                                                                                                  
+            content.GetComponent<Stage>().stagePowerValue = this.playerPowerValue; //着色
         }
     }
 
@@ -175,10 +175,10 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
     
         //スキャンしてきた順番でリストに入れる
         List<GameObject> scanStageList = new List<GameObject>();
-        List<GameObject> fillStageList = new List<GameObject>();
+        List<GameObject> localFillStageList = new List<GameObject>();
 
         scanStageList.Add(stageHexa);
-        fillStageList.Add(stageHexa);
+        localFillStageList.Add(stageHexa);
 
         bool isScanStart = false;
 
@@ -193,11 +193,9 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         //走査を走らせる条件
 
 
-        print("0");
         //開始するマスが赤じゃない&&走査前である(プレイヤーが赤の場合)
         if(isScanStart == true && stageHexa.GetComponent<Stage>().stagePowerValue != playerStagePowerValue && stageHexa.GetComponent<Stage>().isScaned[playerID] == false)
         { 
-            print("1");
             // new によりStopwatch のインスタンスを生成する方法
             var sw = new Stopwatch();
             sw.Start();
@@ -208,8 +206,7 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
       
                 //走査マスが一番外側かつスタートマスが赤じゃない(赤の場合)
                 if(currentScanStage.GetComponent<Stage>().distanceFromEdge == 0 && stageHexa.GetComponent<Stage>().stagePowerValue != playerStagePowerValue)
-                {//端にたどり着いた時の処理内容 
-                    print("2");                         
+                {//端にたどり着いた時の処理内容                        
                     break;
                 }
                 
@@ -226,40 +223,33 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
                         
                     //そのマスの走査前であり  //そのマスが自分の色じゃない場合
                     if((tempIsScaned == false)&&(tempPowerValue != playerStagePowerValue))
-                    {    
-                        print("3");                         
+                    {                          
                         //次の処理マスを返す     
                         nextScanStage = OneOfArroundHexa;
 
                         //リストに追加
                         scanStageList.Add(nextScanStage);
-                        fillStageList.Add(nextScanStage); //スキャンは戻る時に消すので一緒にするとうまく塗れない
+                        localFillStageList.Add(nextScanStage); //スキャンは戻る時に消すので一緒にするとうまく塗れない
 
                         //現在のマスのisScanedを変更
                         currentScanStage.GetComponent<Stage>().isScaned[playerID] = true;
 
-                        print("Next to " + nextScanStage);
                         break;
 
                     }else
-                    {//次のマスが見つかったらbreakしてるので入らない
-                    print("4");                     
+                    {//次のマスが見つかったらbreakしてるので入らない                 
                         //もし6個全部から進む先がなかったら
                         if(i == currentScanStage.GetComponent<Stage>().arroundHexagons.Count-1)
                         {
-                            print("5");
                             if((scanStageList.Count-2) >= 0)//リストが負の数にならないようにする
                             {
-                                print("6");
                                 scanStageList.RemoveAt(scanStageList.Count-1);  //一番後ろを削除、上に持ってってもいいのでは？
 
                                 nextScanStage = scanStageList[scanStageList.Count-1]; //スキャンリストの一番後ろの一つ手前を次のマスにする。一番後ろは行き止まりだったため。                                                        
                             }else //リストが負の数になったら最初に戻ってる   
                             {
-                                print("7");
                                 nextScanStage = stageHexa;                          
-                            }
-                            print("Back to " + nextScanStage);  
+                            }  
 
                             //現在のマスのisScanedを変更
                             currentScanStage.GetComponent<Stage>().isScaned[playerID] = true; 
@@ -272,7 +262,6 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
                     
                     bool isSrounded =false;
                     
-                    print("8");
                     //周囲6回
                     for(int i = 0; i < nextScanStage.GetComponent<Stage>().arroundHexagons.Count; i++ )
                     {
@@ -285,8 +274,7 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
                             
                         //そのマスの走査前であり  //そのマスが自分の色じゃない場合
                         if((tempIsScaned == false)&&(tempPowerValue != playerStagePowerValue))
-                        {    
-                            print("9");                         
+                        {                   
                             //次の処理マスを返す     
                             nextScanStage = OneOfArroundHexa;
 
@@ -296,7 +284,6 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
                             //現在のマスのisScanedを変更
                             currentScanStage.GetComponent<Stage>().isScaned[playerID] = true;
 
-                            print("Next to " + nextScanStage);
                             break;
 
                         }else
@@ -305,19 +292,17 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
                             //もし6個全部から進む先がなかったら
                             if(i == currentScanStage.GetComponent<Stage>().arroundHexagons.Count-1)
                             {
-                                print("11");
                                 isSrounded = true;
                             }
                         }
                     }    
-
+                    
+                    //着色--切り分けたい
                     if(isSrounded == true)
                     {
-                        print("12");
-                        foreach (var content in fillStageList)
+                        foreach (var content in localFillStageList)
                         {                                
-                            print(content.name);
-                            content.GetComponent<Stage>().stagePowerValue = playerStagePowerValue; //着色
+                            fillStageList.Add(content);                            
                         }
                         break;
                     }
