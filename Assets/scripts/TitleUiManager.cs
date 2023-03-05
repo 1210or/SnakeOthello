@@ -37,6 +37,10 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
 
     public GameObject startButton;
 
+    public GameObject selectHeroPanel;
+
+    public GameObject openSelectHeroPanel;
+
 
 
     //ルームボタン格納
@@ -132,8 +136,9 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
         //ルームの名前を反映する
         roomName.text = PhotonNetwork.CurrentRoom.Name;
 
-        createRoomPanel.SetActive(false);
-        lobbyButtons.SetActive(false);
+        CloseUI();
+        roomPanel.SetActive(true);
+
         //ルーム名を表示   
         messageText.GetComponent<Text>().text = "Joined a room: " + PhotonNetwork.CurrentRoom.Name;
 
@@ -151,13 +156,13 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
         PhotonNetwork.LeaveRoom();
 
         //UI
-        roomPanel.SetActive(false);
+        CloseUI();
     }
 
     public void LeaveSelectRoom()
     {
         //UI
-        roomListPanel.SetActive(false);
+        CloseUI();
         //ロビーのUI表示
         lobbyButtons.SetActive(true);
     }
@@ -169,9 +174,9 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
     }
 
     public void FindRoom()
-    {
+    {        
+        CloseUI();
         roomListPanel.SetActive(true);
-        lobbyButtons.SetActive(false);
     }
 
     //ルームリストに更新があったときに呼ばれる関数
@@ -239,7 +244,7 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
         PhotonNetwork.JoinRoom(roomInfo.Name);
 
         //UI
-        roomListPanel.SetActive(false);  
+        CloseUI();
     }
 
     public void GetAllPlayer()
@@ -295,7 +300,7 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
         if (!setName)//名前を入力していない場合
         {
             //UI
-            nameInputPanel.SetActive(false);
+            CloseUI();            
 
             nameInputPanel.SetActive(true);
 
@@ -325,7 +330,7 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
 
             PlayerPrefs.SetString("playerName", nameInput.text);//名前を保存する            
 
-            nameInputPanel.SetActive(false);
+            CloseUI();
             lobbyButtons.SetActive(true);
             //LobbyMenuDisplay();//ロビーに戻る
 
@@ -352,7 +357,7 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
             startButton.SetActive(true);
         }else
         {
-            startButton.SetActive(false);
+            CloseUI();
         }
     }
 
@@ -370,6 +375,28 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
     {
         //mainシーンへ遷移
         PhotonNetwork.LoadLevel(levelToPlay);
+    }
+
+    public void OpenHeroSelectPanel()
+    {
+        selectHeroPanel.SetActive(true);
+    }
+    
+    public void CloseHeroSelectPanel()
+    {
+        selectHeroPanel.SetActive(false);
+    }
+    
+
+    public void CloseUI()
+    {
+        createRoomPanel.SetActive(false);
+        lobbyButtons.SetActive(false);
+        roomPanel.SetActive(false);
+        roomListPanel.SetActive(false);
+        nameInputPanel.SetActive(false);
+        startButton.SetActive(false);
+         selectHeroPanel.SetActive(false);
     }
 
 }
