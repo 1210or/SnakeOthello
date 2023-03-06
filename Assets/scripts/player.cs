@@ -287,8 +287,7 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
                             break;
 
                         }else
-                        {
-                            print("10");
+                        {                            
                             //もし6個全部から進む先がなかったら
                             if(i == currentScanStage.GetComponent<Stage>().arroundHexagons.Count-1)
                             {
@@ -368,8 +367,7 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
             {
                 numOfArroundColorBlocks += 1;
             }
-        }
-        print(numOfArroundColorBlocks);
+        }        
         return numOfArroundColorBlocks;
     }
 

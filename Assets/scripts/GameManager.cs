@@ -142,7 +142,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         while( sw.ElapsedMilliseconds < 100 && isStageArrayOK == false){ //無限ループ防止用
             //ステージ配列nullcheck
             isStageArrayOK = NullCheckStageArray();     
-            print(isStageArrayOK);       
+            print("Is Stage NullCheck : " + isStageArrayOK);       
         }
     }
 
@@ -268,6 +268,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
     IEnumerator AddPlayerArray()
     {
+        print("プレイヤー人数: " + GameObject.FindGameObjectsWithTag("Player").Length);
+        print("isDebug: " + isDebug);
         //2人揃うまで待つ、デバッグモード
         yield return new WaitUntil(() => GameObject.FindGameObjectsWithTag("Player").Length == 2 || isDebug == true);
         

@@ -293,7 +293,6 @@ GameObject:
   m_Component:
   - component: {fileID: 288624435}
   - component: {fileID: 288624438}
-  - component: {fileID: 288624437}
   - component: {fileID: 288624436}
   m_Layer: 0
   m_Name: miniMapCamera
@@ -350,14 +349,6 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
---- !u!81 &288624437
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 288624434}
-  m_Enabled: 1
 --- !u!20 &288624438
 Camera:
   m_ObjectHideFlags: 0
@@ -684,7 +675,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 548303740232e4eee9e957d878fd2594, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalTime: 30
+  isDebug: 0
   ringsCount: 0
   finishText: {fileID: 1181773818}
   nextButton: {fileID: 757782502}
@@ -699,7 +690,6 @@ MonoBehaviour:
   totalPowerCount: 0
   isFinished: 0
   isPlaying: 0
-  isDebug: 0
   isStageArrayOK: 0
 --- !u!114 &505283508
 MonoBehaviour:

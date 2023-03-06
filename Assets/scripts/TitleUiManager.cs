@@ -396,7 +396,7 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
         roomListPanel.SetActive(false);
         nameInputPanel.SetActive(false);
         startButton.SetActive(false);
-         selectHeroPanel.SetActive(false);
+        selectHeroPanel.SetActive(false);
     }
 
 }
