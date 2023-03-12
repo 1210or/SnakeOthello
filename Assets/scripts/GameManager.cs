@@ -8,7 +8,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
 using System.Diagnostics; 
-
+using Debug = UnityEngine.Debug;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
@@ -106,7 +106,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             Application.Quit();
 
         //プレイ中に動作
-        if(GameManager.instance.isPlaying == true && isDebug == false){   
+        if(isPlaying == true && isDebug == false){   
 
             //時間制限と勝敗
             if(totalTime != 0){
@@ -139,10 +139,10 @@ public class GameManager : MonoBehaviourPunCallbacks
         var sw = new Stopwatch();
         sw.Start();
 
-        while( sw.ElapsedMilliseconds < 100 && isStageArrayOK == false){ //無限ループ防止用
+        while( sw.ElapsedMilliseconds < 500 && isStageArrayOK == false){ //無限ループ防止用
             //ステージ配列nullcheck
             isStageArrayOK = NullCheckStageArray();     
-            print("Is Stage NullCheck : " + isStageArrayOK);       
+            Debug.Log("Is Stage NullCheck : " + isStageArrayOK);       
         }
     }
 
@@ -169,6 +169,10 @@ public class GameManager : MonoBehaviourPunCallbacks
        
     IEnumerator JustBeforeGameStart()
     {  
+        int localNum = PhotonNetwork.LocalPlayer.ActorNumber;
+
+        GameObject.Find("LoadingMessage").GetComponent<Text>().text = localNum.ToString();
+
         //ステージアレイが全て格納されたら
         yield return new WaitUntil(() => isStageArrayOK == true);
 
@@ -181,13 +185,14 @@ public class GameManager : MonoBehaviourPunCallbacks
         //エッジから近い順にリストに追加
         AddStageListFromEdge();
 
-        //プレイヤーを生成し変数を初期化
-        GenarateOnlinePlayer(PhotonNetwork.LocalPlayer.ActorNumber - 1);
+        //プレイヤーを生成し変数を初期化        
+        GenarateOnlinePlayer(localNum - 1);
             
         //コルーチン、ゲーム上にプレイヤータグがついた人が2人になったら配列に入れる。同期せずそれぞれで実行
         //isPlayerフラグもこの中でオンになる
         StartCoroutine(AddPlayerArray());
-  
+        
+
         //ステージ回転させないと見栄えが悪いから隠す
         GameObject.Find ("GameLoadingPanel").SetActive(false);
     }
@@ -201,7 +206,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             //プレイヤーの人スタンスを生成
             GameObject player = PhotonNetwork.Instantiate("Player", firstPosition + new Vector3(0, 2, 0) , new Quaternion(1,0,0,180)); 
             
-            //↓プレイヤーのメンバ変数を初期化            
+            //↓プレイヤーのメンバ変数を初期化
                 //初期位置を代入
                 player.GetComponent<Player>().firstPosition = firstPosition;
 
@@ -268,14 +273,13 @@ public class GameManager : MonoBehaviourPunCallbacks
     }
     IEnumerator AddPlayerArray()
     {
-        print("プレイヤー人数: " + GameObject.FindGameObjectsWithTag("Player").Length);
-        print("isDebug: " + isDebug);
+        Debug.Log("プレイヤー人数: " + GameObject.FindGameObjectsWithTag("Player").Length);
+        Debug.Log("isDebug: " + isDebug);
         //2人揃うまで待つ、デバッグモード
         yield return new WaitUntil(() => GameObject.FindGameObjectsWithTag("Player").Length == 2 || isDebug == true);
         
         //プレイヤーを配列に入れる
         GameObject[] tempPlayerArray = GameObject.FindGameObjectsWithTag("Player");
-
 
             for(int j=0; j<tempPlayerArray.Length; j++)
             {
@@ -286,11 +290,11 @@ public class GameManager : MonoBehaviourPunCallbacks
                 {
                     playerArray[1] =  tempPlayerArray[j];                
                 }
-            }
-
-        for(int j=0; j<playerArray.Length; j++)
+            }        
+        
+        for(int j=0; j<tempPlayerArray.Length; j++)
         {
-            playerArray[j].name = "Player_" + j as string;
+            tempPlayerArray[j].name = "Player_" + j as string;
         }
 
         //ゲーム開始

@@ -133,6 +133,7 @@ MonoBehaviour:
   playerCamera: {fileID: 0}
   walkSpeed: 3
   speedBuff: 1
+  playerHero: Normal
   playerID: 0
   enemyPlayerID: 0
   fillStageList: []
@@ -363,7 +364,6 @@ GameObject:
   - component: {fileID: 931893754624219066}
   - component: {fileID: 5633398809028703284}
   - component: {fileID: 5824557991421367493}
-  - component: {fileID: 327220414405112714}
   m_Layer: 3
   m_Name: MiniMapIcon_inside
   m_TagString: Untagged
@@ -436,20 +436,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &327220414405112714
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3060772889274940738}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
 --- !u!1 &4577508279581412149
 GameObject:
   m_ObjectHideFlags: 0
@@ -461,7 +447,6 @@ GameObject:
   - component: {fileID: 2613667300073221555}
   - component: {fileID: 5654977566869531515}
   - component: {fileID: 3902080806062705683}
-  - component: {fileID: 3530002846930581493}
   m_Layer: 3
   m_Name: MiniMapIcon_outside
   m_TagString: Untagged
@@ -534,20 +519,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &3530002846930581493
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4577508279581412149}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5000001
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
 --- !u!1 &5846997132586656588
 GameObject:
   m_ObjectHideFlags: 0

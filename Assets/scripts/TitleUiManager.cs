@@ -57,10 +57,15 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
     
     public static TitleUiManager instance;
 
+    public ToggleGroup heroToggleGroup;
+    public string selectedHero;
+
     // Start is called before the first frame update
     void Awake()
     {   // PhotonServerSettingsの設定内容を使ってマスターサーバーへ接続する
-        PhotonNetwork.ConnectUsingSettings();          
+        PhotonNetwork.ConnectUsingSettings(); 
+
+        selectedHero = "Normal";
 
         //インスタンス生成
         if (instance == null)
@@ -234,7 +239,6 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
             
             //リストに追加
             allRoomButtons.Add(newButton);
-
         }
     }
 
@@ -290,7 +294,6 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
         newPlayerText.text = players.NickName;//テキストに名前を反映
         newPlayerText.transform.SetParent(playerNameContent.transform);//親の設定
 
-
         allPlayerNames.Add(newPlayerText);//リストに追加
     }
 
@@ -306,8 +309,7 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
 
 
             if (PlayerPrefs.HasKey("playerName"))//キーが保存されているか確認
-            {
-                
+            {                
                 placeholderText.text = PlayerPrefs.GetString("playerName");
                 
                 nameInput.text = PlayerPrefs.GetString("playerName");//インプットフィールドに名前を表示しておく
@@ -372,7 +374,7 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
 
     //遷移関数、ボタンから呼び出される
     public void PlayGame()
-    {
+    {   
         //mainシーンへ遷移
         PhotonNetwork.LoadLevel(levelToPlay);
     }
@@ -380,10 +382,14 @@ public class TitleUiManager : MonoBehaviourPunCallbacks
     public void OpenHeroSelectPanel()
     {
         selectHeroPanel.SetActive(true);
+        //Find関数がアクティブなオブジェクトにしか作用しないため、ヒーローパネルが開かれたタイミングで探す
+        heroToggleGroup = GameObject.Find ("HeroNameContent").GetComponent<ToggleGroup>();
     }
     
     public void CloseHeroSelectPanel()
     {
+        //ヒーロー選択パネルを閉じたタイミングで選択しているヒーローを取得
+        selectedHero = heroToggleGroup.ActiveToggles().FirstOrDefault().name;
         selectHeroPanel.SetActive(false);
     }
     

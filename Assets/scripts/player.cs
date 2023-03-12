@@ -5,6 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.Diagnostics; 
 using UnityEngine.UI;
+using System.Linq;
 
 public class Player : MonoBehaviourPunCallbacks, IPunObservable
 {    
@@ -36,10 +37,14 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
 
     public GameObject playerCamera;
 
+    //ヒーローアビリティ--------------------------
+    public string playerHero = "Normal";
     public float walkSpeed = 3;
-    public float speedBuff = 1; //今のところ未使用
-    private float constSpeedBuff = 2;
+    public float heroSpeedBuff = 2;
+    //ヒーローアビリティ--------------------------
 
+    public static Player instance;
+    
     void Awake()
     {
         if (instance == null)
@@ -62,6 +67,9 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         if(photonView.IsMine)
         {
             playerCamera = GameObject.Find ("MainCamera");
+            playerHero = TitleUiManager.instance.selectedHero;
+            print("Hero: " + playerHero);
+            
         }
     }
 
@@ -80,6 +88,7 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         DropPlayer(-2); //引数はy座標、それ以下になったら落ちた判定
     }
 
+    private float speedBuff = 1;
     public void MoveControler()
     {
         if(photonView.IsMine){
@@ -87,7 +96,7 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
             int numOfArroundPlayerColor = CountArroundColor(currentPlayerHexa, playerPowerValue);
             if(numOfArroundPlayerColor == 6)
             {
-                speedBuff = constSpeedBuff;
+                speedBuff = heroSpeedBuff;
             }else
             {
                 speedBuff = 1;
@@ -135,6 +144,7 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         }  
     }
 
+    //色を変える
     IEnumerator WaitIsStart()
     {
         yield return new WaitUntil(() => GameManager.instance.isPlaying == true || GameManager.instance.isDebug == true);
@@ -145,7 +155,7 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
     }
 
     public void ScanAndFill()
-    {
+    {        
         fillStageList = new List<GameObject>();
 
         //現在のマスの周囲をforeach
@@ -153,12 +163,12 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         {
             ScanFrom(currentAround);
         }
-        //走査と塗りは分けるべき、すべて走査し終わった後に塗らないと条件が変わっちゃう
 
+        //走査と塗りは分けるべき、すべて走査し終わった後に塗らないと条件が変わっちゃう
         foreach (var content in fillStageList)
         {                                                                                                  
             content.GetComponent<Stage>().stagePowerValue = this.playerPowerValue; //着色
-        }
+        }        
     }
 
     //走査
@@ -296,7 +306,7 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
                         }
                     }    
                     
-                    //着色--切り分けたい
+                    //着色リストに入れる、切り分けてる
                     if(isSrounded == true)
                     {
                         foreach (var content in localFillStageList)
@@ -348,7 +358,8 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
     private int CountArroundColorBlocks(GameObject stageHexa, int separatePowerValue)
     {
         int numOfArroundColorBlocks = 0;
-        for (int i = 0; i < stageHexa.GetComponent<Stage>().arroundHexagons.Count; i++)
+        int arroundHexaCount = stageHexa.GetComponent<Stage>().arroundHexagons.Count;
+        for (int i = 0; i < arroundHexaCount; i++)
         {
             GameObject currentHexa = stageHexa.GetComponent<Stage>().arroundHexagons[i];
             GameObject lastHexa;
@@ -367,7 +378,13 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
             {
                 numOfArroundColorBlocks += 1;
             }
-        }        
+        }
+
+        if(stageHexa.GetComponent<Stage>().arroundHexagons[0].GetComponent<Stage>().stagePowerValue == stageHexa.GetComponent<Stage>().arroundHexagons[arroundHexaCount-1].GetComponent<Stage>().stagePowerValue)
+        {
+            numOfArroundColorBlocks = numOfArroundColorBlocks-1;
+        }
+
         return numOfArroundColorBlocks;
     }
 
@@ -447,7 +464,8 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
             stream.SendNext(this.GetComponent<Player>().paintColor.g);
             stream.SendNext(this.GetComponent<Player>().paintColor.b);
         
-            //stream.SendNext(this.GetComponent<Player>().solverGameObject);
+            //選択したヒーロー
+            stream.SendNext(this.GetComponent<Player>().playerHero);
 
         }
         else
@@ -476,7 +494,7 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
             float paintColorG = (float)stream.ReceiveNext();
             float paintColorB = (float)stream.ReceiveNext();
 
-            //this.GetComponent<Player>().solverGameObject = (GameObject)stream.ReceiveNext();
+            this.GetComponent<Player>().playerHero = (string)stream.ReceiveNext();
             
             
 
