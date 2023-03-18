@@ -6,6 +6,8 @@ using Photon.Realtime;
 using System.Diagnostics; 
 using UnityEngine.UI;
 using System.Linq;
+using System;
+using System.Reflection;
 
 public class Player : MonoBehaviourPunCallbacks, IPunObservable
 {    
@@ -40,6 +42,11 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
     public string playerHero = "Normal";
     private float walkSpeed = 3;
     private float heroSpeedBuff = 2;
+    
+    public delegate void HeroSkillDelegate();
+    public HeroSkillDelegate passiveSkill;
+    public HeroSkillDelegate activeSkill;
+    public Type heroType;
     //ヒーローアビリティ--------------------------
 
     public static Player instance;
@@ -67,14 +74,8 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         {
             playerCamera = GameObject.Find ("MainCamera");
 
-            //ヒーロー取得
-            playerHero = TitleUiManager.instance.selectedHero;
-            print("Hero: " + playerHero);
-
-            heroParam = Resources.Load<HeroParamater> ("HeroParamater/"+playerHero);
-
-            walkSpeed = heroParam.walkSpeed;
-            heroSpeedBuff = heroParam.heroSpeedBuff;
+            //タイトルからヒーロー取得、パラメータとスキルを設定
+            SetHeroParamsAndSkills(TitleUiManager.instance.selectedHero);
         }
     }
 
@@ -91,6 +92,9 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         
         //ステージから落ちた時の処理
         DropPlayer(-2); //引数はy座標、それ以下になったら落ちた判定
+
+        //それぞれのヒーローのパッシブスキル
+        passiveSkill();
     }
 
     private float speedBuff = 1;
@@ -157,6 +161,19 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         this.transform.Find("player").gameObject.GetComponent<Renderer>().material.color = playerColor;//プレイヤーの子供オブジェクトの色を変える
         this.transform.Find("MiniMapIcon_inside").gameObject.GetComponent<Renderer>().material.color = teamColor;//プレイヤーの子供オブジェクトの色を変える
         this.transform.Find("MiniMapIcon_outside").gameObject.GetComponent<Renderer>().material.color = new Color(1, 1, 1);//プレイヤーの子供オブジェクトの色を変える
+    }
+
+    void SetHeroParamsAndSkills(string playerHero)
+    {
+        heroParam = Resources.Load<HeroParamater> ("HeroParamater/"+playerHero);
+
+        walkSpeed = heroParam.walkSpeed;
+        heroSpeedBuff = heroParam.heroSpeedBuff;
+                                
+        heroType = Type.GetType(playerHero); //選択したヒーローのストリングからクラスを取得
+        Component heroTypeInstance = this.gameObject.AddComponent(heroType); //取得したクラスを用いてヒーロースキルのスクリプトをアタッチ、インスタンスを変数に入れる  
+        MethodInfo passiveSkillMethod = heroTypeInstance.GetType().GetMethod("PassiveSkill"); //インスタンスから変数を取得、型が動的            
+        passiveSkill = (HeroSkillDelegate)Delegate.CreateDelegate(typeof(HeroSkillDelegate), heroTypeInstance, passiveSkillMethod);//デリゲート変数にヒーロータイプが持っているスキルを格納する
     }
 
     public void ScanAndFill()

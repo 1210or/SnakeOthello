@@ -66,7 +66,7 @@ public class GameManager : MonoBehaviourPunCallbacks
                 for(int x=0;x<stageSizeX;x++)//xの大きさぶんループ
                 {      
                     // "RoomObject"プレハブからルームオブジェクトを生成する
-                    GameObject tempPhotonStageObject = PhotonNetwork.InstantiateRoomObject("stageHexa", new Vector3(hexSizeX *  x + z * 0.5f * hexSizeX, 0, z * hexSizeZ ) , new Quaternion(1,0,0,-1));
+                    GameObject tempPhotonStageObject = PhotonNetwork.InstantiateRoomObject("Photon/stageHexa", new Vector3(hexSizeX *  x + z * 0.5f * hexSizeX, 0, z * hexSizeZ ) , new Quaternion(1,0,0,-1));
                     //インデックス情報を付与
                     tempPhotonStageObject.GetComponent<Stage>().stageIndexX = x;
                     tempPhotonStageObject.GetComponent<Stage>().stageIndexZ = z;          
@@ -204,7 +204,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             Vector3 firstPosition = GameManager.instance.stageObject[i * (GameManager.stageSizeX - 1),i * (GameManager.stageSizeZ - 1)].transform.position;
             
             //プレイヤーの人スタンスを生成
-            GameObject player = PhotonNetwork.Instantiate("Player", firstPosition + new Vector3(0, 2, 0) , new Quaternion(1,0,0,180)); 
+            GameObject player = PhotonNetwork.Instantiate("Photon/Player", firstPosition + new Vector3(0, 2, 0) , new Quaternion(1,0,0,180)); 
             
             //↓プレイヤーのメンバ変数を初期化
                 //初期位置を代入

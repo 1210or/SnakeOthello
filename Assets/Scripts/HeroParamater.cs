@@ -11,4 +11,5 @@ public class HeroParamater : ScriptableObject
   public float heroSpeedBuff = 2;
   public float atack = 1;
   public float diffence = 1;
+  public float respornTime = 1;
 }

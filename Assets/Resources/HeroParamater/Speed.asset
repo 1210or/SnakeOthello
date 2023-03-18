@@ -18,3 +18,4 @@ MonoBehaviour:
   heroSpeedBuff: 10
   atack: 1
   diffence: 1
+  respornTime: 3
