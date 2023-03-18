@@ -131,8 +131,7 @@ MonoBehaviour:
   currentPlayerHexa: {fileID: 0}
   newHexaFlag: 0
   playerCamera: {fileID: 0}
-  walkSpeed: 3
-  speedBuff: 1
+  heroParam: {fileID: 11400000, guid: bb4b86811bb864d8c9cd3976bac5a622, type: 2}
   playerHero: Normal
   playerID: 0
   enemyPlayerID: 0

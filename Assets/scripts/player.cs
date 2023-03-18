@@ -33,14 +33,13 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
     //新しいマスに入った瞬間のフラグ
     public bool newHexaFlag = false;
 
-    public static Player instance;
-
     public GameObject playerCamera;
 
     //ヒーローアビリティ--------------------------
+    public HeroParamater heroParam;
     public string playerHero = "Normal";
-    public float walkSpeed = 3;
-    public float heroSpeedBuff = 2;
+    private float walkSpeed = 3;
+    private float heroSpeedBuff = 2;
     //ヒーローアビリティ--------------------------
 
     public static Player instance;
@@ -67,9 +66,15 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         if(photonView.IsMine)
         {
             playerCamera = GameObject.Find ("MainCamera");
+
+            //ヒーロー取得
             playerHero = TitleUiManager.instance.selectedHero;
             print("Hero: " + playerHero);
-            
+
+            heroParam = Resources.Load<HeroParamater> ("HeroParamater/"+playerHero);
+
+            walkSpeed = heroParam.walkSpeed;
+            heroSpeedBuff = heroParam.heroSpeedBuff;
         }
     }
 
