@@ -197,6 +197,12 @@ public class GameManager : MonoBehaviourPunCallbacks
         GameObject.Find ("GameLoadingPanel").SetActive(false);
     }
 
+    public void IsDebugTogle()
+    {
+        if(isDebug == false){isDebug = true;}
+        else{isDebug = false;}
+    }
+
     //オンラインプレイヤーの生成と初期化
     void GenarateOnlinePlayer(int i)
     {                        

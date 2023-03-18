@@ -74,9 +74,11 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
         {
             playerCamera = GameObject.Find ("MainCamera");
 
-            //タイトルからヒーロー取得、パラメータとスキルを設定
-            SetHeroParamsAndSkills(TitleUiManager.instance.selectedHero);
+            playerHero = TitleUiManager.instance.selectedHero;            
         }
+        print("スキル取得");
+        //タイトルからヒーロー取得、パラメータとスキルを設定
+        SetHeroParamsAndSkills(playerHero);
     }
 
     public List<GameObject> fillStageList;
@@ -165,15 +167,24 @@ public class Player : MonoBehaviourPunCallbacks, IPunObservable
 
     void SetHeroParamsAndSkills(string playerHero)
     {
-        heroParam = Resources.Load<HeroParamater> ("HeroParamater/"+playerHero);
+        heroParam = Resources.Load<HeroParamater> ("HeroParamater/" + playerHero);
+        print("0");
 
         walkSpeed = heroParam.walkSpeed;
         heroSpeedBuff = heroParam.heroSpeedBuff;
-                                
+        print("1");
+
         heroType = Type.GetType(playerHero); //選択したヒーローのストリングからクラスを取得
-        Component heroTypeInstance = this.gameObject.AddComponent(heroType); //取得したクラスを用いてヒーロースキルのスクリプトをアタッチ、インスタンスを変数に入れる  
-        MethodInfo passiveSkillMethod = heroTypeInstance.GetType().GetMethod("PassiveSkill"); //インスタンスから変数を取得、型が動的            
+        print("2");
+
+        Component heroTypeInstance = this.gameObject.AddComponent(heroType); //取得したクラスを用いてヒーロースキルのスクリプトをアタッチ、インスタンスを変数に入れる
+        print("3");
+
+        MethodInfo passiveSkillMethod = heroTypeInstance.GetType().GetMethod("PassiveSkill"); //インスタンスから変数を取得、型が動的  
+        print("4");
+
         passiveSkill = (HeroSkillDelegate)Delegate.CreateDelegate(typeof(HeroSkillDelegate), heroTypeInstance, passiveSkillMethod);//デリゲート変数にヒーロータイプが持っているスキルを格納する
+        print("5");
     }
 
     public void ScanAndFill()
